@@ -30,3 +30,16 @@ export interface ChatMessage {
   role: ChatRole;
   text: string;
 }
+
+export interface Season {
+  id: number;
+  description: string;
+  current: boolean;
+}
+
+export interface Team {
+  idteam: number;
+  description: string;
+  idseason: number;
+  season?: Season;
+}

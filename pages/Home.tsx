@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
 import Section from '../components/Section';
 import Footer from '../components/Footer';
 
-import { MatchResult, NewsItem } from '../types';
+import { MatchResult, NewsItem, Team } from '../types';
+import { getTeams } from '../services/teamService';
 
 const Home: React.FC = () => {
+  const [teams, setTeams] = useState<Team[]>([]);
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      const data = await getTeams();
+      setTeams(data);
+    };
+    fetchTeams();
+  }, []);
 
   const match: MatchResult = {
     id: 1,
@@ -116,11 +126,11 @@ const Home: React.FC = () => {
         {/* --- Squadre Preview --- */}
         <Section id="squadre" title="Le Nostre Squadre" bgColor="bg-white">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['Minivolley', 'Under 14', 'Under 16', 'Serie C'].map((team, idx) => (
-              <div key={idx} className="group relative rounded-xl overflow-hidden cursor-pointer h-40">
-                <img src={`https://picsum.photos/seed/${team}/400/300`} alt={team} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+            {teams.map((team) => (
+              <div key={team.idteam} className="group relative rounded-xl overflow-hidden cursor-pointer h-40">
+                <img src={`https://picsum.photos/seed/${team.description}/400/300`} alt={team.description} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500" />
                 <div className="absolute inset-0 bg-blue-900/60 group-hover:bg-blue-900/40 transition flex items-center justify-center">
-                  <h3 className="text-white font-black text-xl md:text-2xl uppercase tracking-wider border-2 border-white px-4 py-2">{team}</h3>
+                  <h3 className="text-white font-black text-xl md:text-2xl uppercase tracking-wider border-2 border-white px-4 py-2">{team.description}</h3>
                 </div>
               </div>
             ))}
