@@ -4,18 +4,26 @@ import Hero from '../components/Hero';
 import Section from '../components/Section';
 import Footer from '../components/Footer';
 
-import { MatchResult, NewsItem, Team } from '../types';
+import { MatchResult, NewsItem, Team, Partner } from '../types';
 import { getTeams } from '../services/teamService';
+import { getPartners } from '../services/partnerService';
+import buttonBg from '../images/button.jpg';
 
 const Home: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
 
   useEffect(() => {
     const fetchTeams = async () => {
       const data = await getTeams();
       setTeams(data);
     };
+    const fetchPartners = async () => {
+      const data = await getPartners();
+      setPartners(data);
+    };
     fetchTeams();
+    fetchPartners();
   }, []);
 
   const match: MatchResult = {
@@ -128,7 +136,7 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {teams.map((team) => (
               <div key={team.idteam} className="group relative rounded-xl overflow-hidden cursor-pointer h-40">
-                <img src={`https://picsum.photos/seed/${team.description}/400/300`} alt={team.description} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                <img src={buttonBg} alt={team.description} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500" />
                 <div className="absolute inset-0 bg-blue-900/60 group-hover:bg-blue-900/40 transition flex items-center justify-center">
                   <h3 className="text-white font-black text-xl md:text-2xl uppercase tracking-wider border-2 border-white px-4 py-2">{team.description}</h3>
                 </div>
@@ -139,11 +147,26 @@ const Home: React.FC = () => {
 
         {/* --- Sponsor --- */}
         <Section id="sponsor" title="I Nostri Sponsor" bgColor="bg-gray-50">
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-            <div className="h-16 w-32 bg-gray-300 rounded flex items-center justify-center font-bold text-gray-500">Sponsor 1</div>
-            <div className="h-16 w-32 bg-gray-300 rounded flex items-center justify-center font-bold text-gray-500">Sponsor 2</div>
-            <div className="h-16 w-32 bg-gray-300 rounded flex items-center justify-center font-bold text-gray-500">Sponsor 3</div>
-            <div className="h-16 w-32 bg-gray-300 rounded flex items-center justify-center font-bold text-gray-500">Sponsor 4</div>
+          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+            {partners.length > 0 ? (
+              partners.map((partner) => (
+                <div key={partner.idpartner} className="relative h-24 w-48 flex items-center justify-center rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 duration-500">
+                  <img
+                    src={partner.logo_url || buttonBg}
+                    alt={partner.description}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = buttonBg;
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <h3 className="text-libertas-blue font-black text-lg uppercase tracking-wider border-2 border-white px-2 py-1 bg-white/70 backdrop-blur-sm rounded">{partner.description}</h3>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-gray-500">Nessuno sponsor disponibile al momento.</div>
+            )}
           </div>
         </Section>
 

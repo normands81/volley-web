@@ -43,3 +43,12 @@ export interface Team {
   idseason: number;
   season?: Season;
 }
+
+export interface Partner {
+  idpartner: number;
+  description: string;
+  logo_url?: string;
+  website_url?: string;
+  active: boolean;
+  idseason: number;
+}
