@@ -28,7 +28,7 @@ jobs:
         protocol: ftps
         # 'local-dir' depends on your project. 
         # Use './' for simple PHP/HTML. Use './dist/' or './build/' for React/Vue.
-        local-dir: ./ 
+        local-dir: ./volley-web/ 
         # Aruba usually requires files to be in the root or a specific folder like /www
         # Leave this as ./ if your FTP user lands directly in the public folder.
         server-dir: ./volley/
