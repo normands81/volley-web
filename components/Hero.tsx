@@ -1,12 +1,11 @@
 import React from 'react';
-import heroBg from '@/images/hero-background.png';
 
 const Hero: React.FC = () => {
     return (
         <section className="relative h-[600px] flex items-center justify-center text-white overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <img
-                    src={heroBg}
+                    src="/images/hero-background.png"
                     alt="Volley Action"
                     className="w-full h-full object-cover"
                     onError={(e) => {

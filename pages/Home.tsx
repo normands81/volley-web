@@ -7,7 +7,8 @@ import Footer from '../components/Footer';
 import { MatchResult, NewsItem, Team, Partner } from '../types';
 import { getTeams } from '../services/teamService';
 import { getPartners } from '../services/partnerService';
-import buttonBg from '../images/button.jpg';
+
+const buttonBg = '/images/button.jpg';
 
 const Home: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);

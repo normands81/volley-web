@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from '@/images/logo-libertas.jpg';
 
 const Footer: React.FC = () => {
     return (
@@ -8,7 +7,7 @@ const Footer: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     <div>
                         <div className="text-2xl font-black text-white tracking-tighter mb-6">
-                            <img src={logo} alt="Libertas Borgo Volley" className="h-12 w-auto" />
+                            <img src="/images/logo-libertas.jpg" alt="Libertas Borgo Volley" className="h-12 w-auto" />
                         </div>
                         <p className="text-gray-400 leading-relaxed">
                             La società di riferimento per la pallavolo a Borgo San Dalmazzo. Dal minivolley alla prima squadra, una grande famiglia unita dalla passione.
