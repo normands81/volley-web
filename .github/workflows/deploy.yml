@@ -1,9 +1,9 @@
-name: Deploy to Aruba Shared Hosting
+name: Deploy to Aruba
 
 on:
   push:
     branches:
-      - main  # Change this if your branch is named 'master'
+      - main
 
 jobs:
   web-deploy:
@@ -12,12 +12,6 @@ jobs:
     steps:
     - name: Get latest code
       uses: actions/checkout@v4
-    
-    # Optional: Add build steps here if you use React/Vue/etc.
-    # - name: Build Project
-    #   run: |
-    #     npm install
-    #     npm run build
 
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -25,10 +19,17 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        protocol: ftp
-        # 'local-dir' depends on your project. 
-        # Use './' for simple PHP/HTML. Use './dist/' or './build/' for React/Vue.
-        local-dir: ./
-        # Aruba usually requires files to be in the root or a specific folder like /www
-        # Leave this as ./ if your FTP user lands directly in the public folder.
-        server-dir: volley/
+        
+        # ARUBA SPECIFIC SETTINGS
+        protocol: ftp              # Force plain FTP
+        security: loose            # Accept Aruba's sometimes-weird certificates
+        
+        local-dir: ./              # Upload everything from GitHub
+        server-dir: volley/        # Destination (No dot at the start!)
+        
+        # CRITICAL: Prevent the state file from causing loops
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/.github/**
+          **/.ftp-deploy-sync-state.json
