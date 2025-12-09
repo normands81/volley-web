@@ -156,7 +156,7 @@ const Home: React.FC = () => {
                   <img
                     src={partner.logo ? getAssetPath(partner.logo) : getButtonBg()}
                     alt={partner.description}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain p-2"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       const fallback = getButtonBg();
@@ -165,8 +165,8 @@ const Home: React.FC = () => {
                       }
                     }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <h3 className="text-libertas-blue font-black text-lg uppercase tracking-wider border-2 border-white px-2 py-1 bg-white/70 backdrop-blur-sm rounded">{partner.description}</h3>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                    <h3 className="text-libertas-blue font-black text-lg uppercase tracking-wider border-2 border-white px-2 py-1 bg-white/90 backdrop-blur-sm rounded">{partner.description}</h3>
                   </div>
                 </div>
               ))
