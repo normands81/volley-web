@@ -119,7 +119,7 @@ const Home: React.FC = () => {
                   <div className="text-xs font-bold text-libertas-blue uppercase mb-2">{new Date(item.event_date).toLocaleDateString()}</div>
                   <h3 className="font-display font-bold text-xl mb-3 leading-tight">{item.title}</h3>
                   <p className="text-gray-600 text-sm mb-4 flex-grow">
-                    {item.description.length > 30 ? item.description.substring(0, 30) + '...' : item.description}
+                    {item.description.length > 100 ? item.description.substring(0, 100) + '...' : item.description}
                   </p>
                   <a href="#" className="text-libertas-blue font-bold text-sm hover:underline mt-auto flex items-center">
                     Leggi tutto
