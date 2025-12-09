@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import { MatchResult, NewsItem, Team, Partner } from '../types';
 import { getTeams } from '../services/teamService';
 import { getPartners } from '../services/partnerService';
+import { getNews } from '../services/newsService';
 import { getAssetPath } from '../utils';
 
 const getButtonBg = () => getAssetPath('/images/button.jpg');
@@ -14,6 +15,7 @@ const getButtonBg = () => getAssetPath('/images/button.jpg');
 const Home: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [news, setNews] = useState<NewsItem[]>([]);
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -24,8 +26,13 @@ const Home: React.FC = () => {
       const data = await getPartners();
       setPartners(data);
     };
+    const fetchNews = async () => {
+      const data = await getNews();
+      setNews(data);
+    };
     fetchTeams();
     fetchPartners();
+    fetchNews();
   }, []);
 
   const match: MatchResult = {
@@ -38,29 +45,7 @@ const Home: React.FC = () => {
     category: "Serie C Maschile"
   };
 
-  const news: NewsItem[] = [
-    {
-      id: 1,
-      title: "Vittoria schiacciante in trasferta!",
-      excerpt: "La nostra Under 16 espugna il campo di Alba con un netto 3-0. Grandissima prestazione di squadra.",
-      date: "12 Maggio 2024",
-      imageUrl: "https://picsum.photos/id/158/400/250"
-    },
-    {
-      id: 2,
-      title: "Open Day Minivolley",
-      excerpt: "Sabato prossimo porte aperte per tutti i bambini dai 6 ai 10 anni che vogliono provare la pallavolo.",
-      date: "10 Maggio 2024",
-      imageUrl: "https://picsum.photos/id/17/400/250"
-    },
-    {
-      id: 3,
-      title: "Nuovo Sponsor Tecnico",
-      excerpt: "Siamo orgogliosi di annunciare la partnership con SportTime per la fornitura delle nuove divise ufficiali.",
-      date: "05 Maggio 2024",
-      imageUrl: "https://picsum.photos/id/20/400/250"
-    }
-  ];
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -115,14 +100,27 @@ const Home: React.FC = () => {
         <Section id="notizie" title="Notizie e Aggiornamenti" bgColor="bg-libertas-accent">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {news.map(item => (
-              <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
+              <div key={item.idnews} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
                 <div className="h-48 overflow-hidden">
-                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transform hover:scale-110 transition duration-500" />
+                  <img
+                    src={item.image ? getAssetPath(item.image) : getButtonBg()}
+                    alt={item.title}
+                    className="w-full h-full object-cover transform hover:scale-110 transition duration-500"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      const fallback = getButtonBg();
+                      if (!target.src.endsWith(fallback)) {
+                        target.src = fallback;
+                      }
+                    }}
+                  />
                 </div>
                 <div className="p-6 flex-grow flex flex-col">
-                  <div className="text-xs font-bold text-libertas-blue uppercase mb-2">{item.date}</div>
+                  <div className="text-xs font-bold text-libertas-blue uppercase mb-2">{new Date(item.event_date).toLocaleDateString()}</div>
                   <h3 className="font-display font-bold text-xl mb-3 leading-tight">{item.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4 flex-grow">{item.excerpt}</p>
+                  <p className="text-gray-600 text-sm mb-4 flex-grow">
+                    {item.description.length > 30 ? item.description.substring(0, 30) + '...' : item.description}
+                  </p>
                   <a href="#" className="text-libertas-blue font-bold text-sm hover:underline mt-auto flex items-center">
                     Leggi tutto
                     <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>

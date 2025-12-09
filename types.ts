@@ -14,11 +14,11 @@ export interface MatchResult {
 }
 
 export interface NewsItem {
-  id: number;
+  idnews: number;
   title: string;
-  excerpt: string;
-  date: string;
-  imageUrl: string;
+  description: string;
+  event_date: string;
+  image?: string;
 }
 
 export enum ChatRole {
