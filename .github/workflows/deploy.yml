@@ -25,7 +25,7 @@ jobs:
         security: loose            # Accept Aruba's sometimes-weird certificates
         
         local-dir: ./              # Upload everything from GitHub
-        server-dir: volley/        # Destination (No dot at the start!)
+        server-dir: /www.normandesalvia.com/volley/        # Destination (No dot at the start!)
         
         # CRITICAL: Prevent the state file from causing loops
         exclude: |
