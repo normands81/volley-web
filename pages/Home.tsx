@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
 import Section from '../components/Section';
@@ -121,10 +122,10 @@ const Home: React.FC = () => {
                   <p className="text-gray-600 text-sm mb-4 flex-grow">
                     {item.description.length > 100 ? item.description.substring(0, 100) + '...' : item.description}
                   </p>
-                  <a href="#" className="text-libertas-blue font-bold text-sm hover:underline mt-auto flex items-center">
+                  <Link to={`/news/${item.idnews}`} className="text-libertas-blue font-bold text-sm hover:underline mt-auto flex items-center">
                     Leggi tutto
                     <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                  </a>
+                  </Link>
                 </div>
               </div>
             ))}
