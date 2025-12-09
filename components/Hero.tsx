@@ -1,17 +1,14 @@
 import React from 'react';
+import { getAssetPath } from '../utils';
 
 const Hero: React.FC = () => {
     return (
         <section className="relative h-[600px] flex items-center justify-center text-white overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <img
-                    src="/images/hero-background.png"
+                    src={getAssetPath('/images/hero-background.png')}
                     alt="Volley Action"
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                        // Fallback if image doesn't exist
-                        (e.target as HTMLImageElement).src = 'https://picsum.photos/id/1059/1920/1080';
-                    }}
                 />
 
                 <div className="absolute inset-0 bg-blue-900/70 mix-blend-multiply"></div>

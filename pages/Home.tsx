@@ -7,8 +7,9 @@ import Footer from '../components/Footer';
 import { MatchResult, NewsItem, Team, Partner } from '../types';
 import { getTeams } from '../services/teamService';
 import { getPartners } from '../services/partnerService';
+import { getAssetPath } from '../utils';
 
-const buttonBg = '/images/button.jpg';
+const getButtonBg = () => getAssetPath('/images/button.jpg');
 
 const Home: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -137,7 +138,7 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {teams.map((team) => (
               <div key={team.idteam} className="group relative rounded-xl overflow-hidden cursor-pointer h-40">
-                <img src={buttonBg} alt={team.description} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                <img src={getButtonBg()} alt={team.description} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500" />
                 <div className="absolute inset-0 bg-blue-900/60 group-hover:bg-blue-900/40 transition flex items-center justify-center">
                   <h3 className="text-white font-black text-xl md:text-2xl uppercase tracking-wider border-2 border-white px-4 py-2">{team.description}</h3>
                 </div>
@@ -153,11 +154,15 @@ const Home: React.FC = () => {
               partners.map((partner) => (
                 <div key={partner.idpartner} className="relative h-24 w-48 flex items-center justify-center rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 duration-500">
                   <img
-                    src={partner.logo || buttonBg}
+                    src={partner.logo ? getAssetPath(partner.logo) : getButtonBg()}
                     alt={partner.description}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = buttonBg;
+                      const target = e.target as HTMLImageElement;
+                      const fallback = getButtonBg();
+                      if (!target.src.endsWith(fallback)) {
+                        target.src = fallback;
+                      }
                     }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
