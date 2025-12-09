@@ -31,4 +31,4 @@ jobs:
         local-dir: ./
         # Aruba usually requires files to be in the root or a specific folder like /www
         # Leave this as ./ if your FTP user lands directly in the public folder.
-        server-dir: ./volley/
+        server-dir: volley/
