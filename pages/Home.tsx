@@ -152,7 +152,7 @@ const Home: React.FC = () => {
               partners.map((partner) => (
                 <div key={partner.idpartner} className="relative h-24 w-48 flex items-center justify-center rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 duration-500">
                   <img
-                    src={partner.logo_url || buttonBg}
+                    src={partner.logo || buttonBg}
                     alt={partner.description}
                     className="w-full h-full object-cover"
                     onError={(e) => {

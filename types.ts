@@ -47,7 +47,7 @@ export interface Team {
 export interface Partner {
   idpartner: number;
   description: string;
-  logo_url?: string;
+  logo?: string;
   website_url?: string;
   active: boolean;
   idseason: number;
