@@ -152,7 +152,7 @@ const Home: React.FC = () => {
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">
             {partners.length > 0 ? (
               partners.map((partner) => (
-                <div key={partner.idpartner} className="relative h-24 w-48 flex items-center justify-center rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all opacity-70 grayscale hover:grayscale-0 hover:opacity-100 duration-500">
+                <div key={partner.idpartner} className="relative h-24 w-48 flex items-center justify-center rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-500 hover:grayscale">
                   <img
                     src={partner.logo ? getAssetPath(partner.logo) : getButtonBg()}
                     alt={partner.description}
