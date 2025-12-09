@@ -1,11 +1,12 @@
 import React from 'react';
+import logo from '@/images/logo-libertas.jpg';
 
 const Header: React.FC = () => {
     return (
         <header className="bg-white shadow-md sticky top-0 z-50">
             <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                 <div className="text-2xl font-black text-blue-900 tracking-tighter">
-                    <img src="/logo-libertas.jpg" alt="Libertas Borgo Volley" className="h-12 w-auto" />
+                    <img src={logo} alt="Libertas Borgo Volley" className="h-12 w-auto" />
                 </div>
                 <nav className="hidden md:block">
                     <ul className="flex space-x-8 font-medium">
