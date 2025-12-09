@@ -152,11 +152,11 @@ const Home: React.FC = () => {
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">
             {partners.length > 0 ? (
               partners.map((partner) => (
-                <div key={partner.idpartner} className="relative h-24 w-48 flex items-center justify-center rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-500 hover:grayscale">
+                <div key={partner.idpartner} className="relative h-24 w-48 flex items-center justify-center rounded-lg overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:scale-125 hover:z-10 bg-white group">
                   <img
                     src={partner.logo ? getAssetPath(partner.logo) : getButtonBg()}
                     alt={partner.description}
-                    className="w-full h-full object-contain p-2"
+                    className="w-full h-full object-contain p-2 transition-all duration-300 group-hover:opacity-20"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       const fallback = getButtonBg();
@@ -165,8 +165,8 @@ const Home: React.FC = () => {
                       }
                     }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                    <h3 className="text-libertas-blue font-black text-lg uppercase tracking-wider border-2 border-white px-2 py-1 bg-white/90 backdrop-blur-sm rounded">{partner.description}</h3>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-2 text-center">
+                    <h3 className="text-libertas-blue font-serif font-bold text-lg leading-tight">{partner.description}</h3>
                   </div>
                 </div>
               ))
