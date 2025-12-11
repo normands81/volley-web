@@ -148,7 +148,7 @@ const Home: React.FC = () => {
 
         {/* --- Sponsor --- */}
         <Section id="sponsor" title="I Nostri Sponsor" bgColor="bg-gray-50">
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16 justify-items-center">
             {partners.length > 0 ? (
               partners.map((partner) => (
                 <div key={partner.idpartner} className="relative h-24 w-48 flex items-center justify-center rounded-lg overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:scale-150 hover:z-10 bg-white group">
