@@ -4,11 +4,12 @@
             "command": "npx",
             "args": [
                 "-y",
-                "@supabase/mcp-server"
+                "@supabase/mcp-server-supabase"
             ],
             "env": {
                 "SUPABASE_URL": "https://kwccljsfbvkejnrdjjqq.supabase.co",
-                "SUPABASE_SERVICE_KEY": "sb_secret_KpKrGUd_RyaR7TH6gBe6tg_uCPEvRem"
+                "SUPABASE_SERVICE_KEY": "sb_secret_KpKrGUd_RyaR7TH6gBe6tg_uCPEvRem",
+                "SUPABASE_ACCESS_TOKEN": "sbp_503b89c4ec0fcdb224103adb831719efd5c2feb8"
             }
         }
     }
