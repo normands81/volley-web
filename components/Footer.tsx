@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { getAssetPath } from '../utils';
 
 const Footer: React.FC = () => {
@@ -39,7 +40,7 @@ const Footer: React.FC = () => {
                             <li><a href="#" className="hover:text-yellow-500 transition">Chi Siamo</a></li>
                             <li><a href="#" className="hover:text-yellow-500 transition">Le Squadre</a></li>
                             <li><a href="#" className="hover:text-yellow-500 transition">Iscrizioni</a></li>
-                            <li><a href="#" className="hover:text-yellow-500 transition">Area Riservata</a></li>
+                            <li><Link to="/backend" className="hover:text-yellow-500 transition">Area Riservata</Link></li>
                             <li><a href="#" className="hover:text-yellow-500 transition">Privacy Policy</a></li>
                         </ul>
                     </div>
@@ -54,8 +55,13 @@ const Footer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
+                <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm flex flex-col items-center gap-4">
                     <p>&copy; {new Date().getFullYear()} Libertas Borgo Volley ASD. Tutti i diritti riservati.</p>
+                    <Link to="/backend" className="text-gray-700 hover:text-gray-500 transition-colors" aria-label="Login Admin">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </Link>
                 </div>
             </div>
         </footer>
