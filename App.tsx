@@ -10,7 +10,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/news/:id" element={<NewsDetails />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/backend" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
