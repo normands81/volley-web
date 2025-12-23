@@ -8,25 +8,67 @@ const UpdatePassword: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [sessionLoading, setSessionLoading] = useState(true); // New state to block UI while checking session
+    const [hasSession, setHasSession] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Check if we have a session. If not, the user might have accessed this page directly without an invite link.
-        // However, Supabase usually handles the hash fragment parsing and session recovery automatically.
-        const checkSession = async () => {
+        let mounted = true;
+
+        const initSession = async () => {
+            // 1. Check existing session immediately
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                // Without a session, they can't update their password (unless using a recovery token, but invite flow usually establishes a session).
-                // For now, we'll let them try, but Supabase will likely reject it if no session.
-                // Ideally, we'd redirect to login if no session is found after a short delay, but let's allow the form to render.
+
+            if (session) {
+                if (mounted) {
+                    setHasSession(true);
+                    setSessionLoading(false);
+                }
+                return;
             }
+
+            // 2. If no session, wait a bit for onAuthStateChange (e.g. handling token from URL)
+            // We set a timeout to stop waiting eventually
+            setTimeout(() => {
+                if (mounted && !hasSession) {
+                    setSessionLoading(false); // Stop loading, let the UI decide what to show (likely "No session" error)
+                }
+            }, 4000); // 4 seconds max wait for token parsing
         };
-        checkSession();
+
+        // Listen for auth changes (token parsed, login success, etc.)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            console.log("UpdatePassword Auth Event:", event, session);
+            if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY' || event === 'TOKEN_REFRESHED') {
+                if (session && mounted) {
+                    setHasSession(true);
+                    setSessionLoading(false);
+                    setError(null);
+                }
+            } else if (event === 'SIGNED_OUT') {
+                if (mounted) {
+                    setHasSession(false);
+                    setSessionLoading(false);
+                }
+            }
+        });
+
+        initSession();
+
+        return () => {
+            mounted = false;
+            subscription.unsubscribe();
+        };
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+
+        if (!hasSession) {
+            setError("Sessione scaduta o mancante. Riprova a cliccare sul link della mail.");
+            return;
+        }
 
         if (password !== confirmPassword) {
             setError("Le password non coincidono.");
@@ -48,9 +90,6 @@ const UpdatePassword: React.FC = () => {
             if (error) {
                 setError(error.message);
             } else {
-                // Success! Redirect to login page as requested.
-                // We might want to sign them out first to force a fresh login with the new password,
-                // or just redirect them. The user asked to "redirect to login page".
                 await supabase.auth.signOut();
                 navigate('/backend');
             }
@@ -62,9 +101,43 @@ const UpdatePassword: React.FC = () => {
         }
     };
 
+    if (sessionLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-libertas-accent px-4">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-libertas-blue mx-auto mb-4"></div>
+                    <p className="text-gray-600 font-sans">Verifica sessione in corso...</p>
+                    <p className="text-xs text-gray-400 mt-2">Attendere mentre recuperiamo la tua identificazione.</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!hasSession) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-libertas-accent px-4">
+                <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
+                    <img
+                        src={getAssetPath('/images/logo-libertas.jpg')}
+                        alt="Libertas Error"
+                        className="w-20 h-20 mx-auto mb-4 grayscale opacity-50"
+                    />
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Link non valido o scaduto</h2>
+                    <p className="text-gray-600 mb-6 font-sans">
+                        Non è stato possibile recuperare la sessione di lavoro. Il link di invito potrebbe essere scaduto, oppure è stato già utilizzato.
+                    </p>
+                    <div className="bg-yellow-50 border border-yellow-200 p-4 rounded text-sm text-left mb-6 text-yellow-800">
+                        <strong>Suggerimento:</strong> Assicurati di aver aperto il link nello stesso browser dove stai visualizzando questa pagina. Se il problema persiste, richiedi un nuovo invito.
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-libertas-accent px-4">
             <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+                {/* Form Content */}
                 <div className="text-center mb-8">
                     <img
                         src={getAssetPath('/images/logo-libertas.jpg')}
