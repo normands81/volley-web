@@ -4,10 +4,12 @@ import Home from './pages/Home';
 import NewsDetails from './pages/NewsDetails';
 import Login from './backend/Login';
 import UpdatePassword from './backend/UpdatePassword';
+import AuthCallback from './components/AuthCallback';
 
 const App: React.FC = () => {
   return (
     <HashRouter>
+      <AuthCallback />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/news/:id" element={<NewsDetails />} />
