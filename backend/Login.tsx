@@ -1,15 +1,36 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getAssetPath } from '../utils';
+import { supabase } from '../services/supabaseClient';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Implement actual login logic
-        console.log('Login attempt:', { email, password });
+        setError(null);
+
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) {
+                setError(error.message);
+                return;
+            }
+
+            if (data.user) {
+                navigate('/');
+            }
+        } catch (err) {
+            setError('Si è verificato un errore imprevisto.');
+            console.error('Login error:', err);
+        }
     };
 
     return (
@@ -30,6 +51,11 @@ const Login: React.FC = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                        <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm mb-4 border border-red-200">
+                            {error}
+                        </div>
+                    )}
                     <div>
                         <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2 font-sans">
                             Email
