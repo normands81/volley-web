@@ -1,49 +1,72 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 
 const AuthCallback = () => {
+    const navigate = useNavigate();
+
     useEffect(() => {
         const handleHash = async () => {
-            // Check if the current URL contains a hash with access_token (Supabase redirect)
-            // Example: .../#access_token=...&refresh_token=...&type=recovery
-            const hash = window.location.hash;
+            // HashRouter can result in URLs like: http://localhost/#/path#access_token=...
+            // or http://localhost/#access_token=... (if no path)
+            // We search the ENTIRE href for the token, not just the last hash.
+            const url = window.location.href;
 
-            if (hash && hash.includes('access_token')) {
-                // Remove the '#' if present at the start for parsing, BUT
-                // HashRouter uses #/path, and Supabase appends #access_token to the existing hash or as a new hash.
-                // If the URL is http://localhost:3000/#/update-password#access_token=... (double hash issue),
-                // browsers might handle it weirdly.
+            if (url.includes('access_token=') && url.includes('refresh_token=')) {
+                console.log("AuthCallback: Token detected in URL. Attempting manual setSession.");
 
-                // Supabase usually redirects to: Site URL + #access_token=...
-                // If Site URL is http://localhost:3000/volley/, then it goes to http://localhost:3000/volley/#access_token=...
+                try {
+                    // Attempt to extract tokens regardless of where they are
+                    const accessTokenMatch = url.match(/access_token=([^&]+)/);
+                    const refreshTokenMatch = url.match(/refresh_token=([^&]+)/);
 
-                // We attempt to let supabase client parse it.
-                // But sometimes we need to manually extract it if the router clears it.
+                    if (accessTokenMatch && refreshTokenMatch) {
+                        const access_token = accessTokenMatch[1];
+                        const refresh_token = refreshTokenMatch[1];
 
-                const { data, error } = await supabase.auth.getSession();
-                if (data.session) {
-                    console.log("Session recovered via AuthCallback:", data.session);
-                } else {
-                    console.warn("AuthCallback: Hash present but no session found yet.");
+                        const { data, error } = await supabase.auth.setSession({
+                            access_token,
+                            refresh_token
+                        });
+
+                        if (error) {
+                            console.error("Manual setSession failed:", error);
+                        } else if (data.session) {
+                            console.log("Manual setSession success:", data.session);
+                            navigate('/update-password');
+                        }
+                    }
+                } catch (e) {
+                    console.error("AuthCallback error:", e);
+                }
+            } else {
+                // If standard Supabase logic worked (or if we already have session)
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    // Check if we are on a recovery flow path but somehow not redirected
+                    // navigate('/update-password'); // Optional: only if we want to force it
                 }
             }
         };
 
         handleHash();
 
-        // Also listen for auth state changes globally here
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
-                console.log("Auth State Change:", event, session);
+            console.log("Auth State ChangeEvent:", event);
+            if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+                // Force redirect if this looks like a recovery flow
+                if (window.location.hash.includes('type=recovery') || event === 'PASSWORD_RECOVERY') {
+                    navigate('/update-password');
+                }
             }
         });
 
         return () => {
             subscription.unsubscribe();
         };
-    }, []);
+    }, [navigate]);
 
-    return null; // This component handles side effects only
+    return null;
 };
 
 export default AuthCallback;
