@@ -17,6 +17,17 @@ import { getAssetPath } from '../utils';
 const DashboardLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [userEmail, setUserEmail] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user && user.email) {
+                setUserEmail(user.email);
+            }
+        };
+        getUser();
+    }, []);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -52,8 +63,8 @@ const DashboardLayout: React.FC = () => {
                                 key={item.path}
                                 to={item.path}
                                 className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                        ? 'bg-blue-500 text-white shadow-lg'
-                                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                    ? 'bg-blue-500 text-white shadow-lg'
+                                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                     }`}
                             >
                                 {item.icon}
@@ -99,7 +110,7 @@ const DashboardLayout: React.FC = () => {
                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
                                 <User size={18} />
                             </div>
-                            <span className="text-sm font-medium text-slate-700">Admin</span>
+                            <span className="text-sm font-medium text-slate-700">{userEmail || 'Admin'}</span>
                         </div>
                     </div>
                 </header>

@@ -24,7 +24,48 @@ const StatCard = ({ title, count, subtitle, icon, buttonText, buttonColor }: any
     </div>
 );
 
+import { supabase } from '../services/supabaseClient';
+
 const Dashboard: React.FC = () => {
+    const [teamsCount, setTeamsCount] = React.useState<number | null>(null);
+
+    React.useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                // 1. Get the current active season
+                const { data: seasonData, error: seasonError } = await supabase
+                    .from('TbSeasons')
+                    .select('id')
+                    .eq('active', true)
+                    .eq('current', true)
+                    .single();
+
+                if (seasonError) {
+                    console.error('Error fetching active season:', seasonError);
+                    return;
+                }
+
+                if (seasonData) {
+                    // 2. Count teams for this season
+                    const { count, error: countError } = await supabase
+                        .from('TbTeams')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('idseason', seasonData.id);
+
+                    if (countError) {
+                        console.error('Error counting teams:', countError);
+                    } else {
+                        setTeamsCount(count);
+                    }
+                }
+            } catch (err) {
+                console.error('Unexpected error fetching dashboard stats:', err);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
     return (
         <div className="space-y-8">
             <div>
@@ -36,7 +77,7 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard
                     title="Squadre"
-                    count="12"
+                    count={teamsCount !== null ? teamsCount.toString() : "-"}
                     subtitle="Totale attive"
                     icon={<Shield size={24} />}
                     buttonText="Aggiungi Nuova"
