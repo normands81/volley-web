@@ -21,8 +21,8 @@ const App: React.FC = () => {
 
         {/* Protected Dashboard Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/backend" element={<DashboardLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="/backend/dashboard" element={<Dashboard />} />
             {/* Future routes: squadre, atleti, etc. */}
           </Route>
         </Route>
