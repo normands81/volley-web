@@ -1,0 +1,133 @@
+import React from 'react';
+import {
+    Users,
+    Shield,
+    Newspaper,
+    Calendar,
+    ArrowRight,
+    Edit3
+} from 'lucide-react';
+
+const StatCard = ({ title, count, subtitle, icon, buttonText, buttonColor }: any) => (
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+        <div className="mb-4 text-slate-400 bg-slate-50 p-3 rounded-full">
+            {icon}
+        </div>
+        <h3 className="text-slate-500 font-medium text-sm uppercase tracking-wide mb-1">{title}</h3>
+        <p className="text-4xl font-bold text-slate-800 mb-2">{count}</p>
+        <span className="text-xs text-slate-400 mb-6">{subtitle}</span>
+
+        <button className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 ${buttonColor}`}>
+            <span>{buttonText}</span>
+            <ArrowRight size={16} />
+        </button>
+    </div>
+);
+
+const Dashboard: React.FC = () => {
+    return (
+        <div className="space-y-8">
+            <div>
+                <h1 className="text-2xl font-bold text-slate-800 font-display">Dashboard</h1>
+                <p className="text-slate-500 text-sm">Benvenuto nel pannello di controllo.</p>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatCard
+                    title="Squadre"
+                    count="12"
+                    subtitle="Totale attive"
+                    icon={<Shield size={24} />}
+                    buttonText="Aggiungi Nuova"
+                    buttonColor="bg-green-500"
+                />
+                <StatCard
+                    title="Sponsor"
+                    count="245"
+                    subtitle="Iscritti totali" // Placeholder text from design
+                    icon={<Users size={24} />}
+                    buttonText="Rinnova"
+                    buttonColor="bg-orange-500"
+                />
+                <StatCard
+                    title="News"
+                    count="84"
+                    subtitle="Articolo pubblicati"
+                    icon={<Newspaper size={24} />}
+                    buttonText="Scrivi Post"
+                    buttonColor="bg-blue-500"
+                />
+            </div>
+
+            {/* Content Split */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Recent Athletes */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h3 className="font-bold text-slate-800 mb-4">Ultimi Atleti Iscritti</h3>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="text-xs text-slate-400 uppercase bg-slate-50">
+                                <tr>
+                                    <th className="px-3 py-2 rounded-l-lg">Nome</th>
+                                    <th className="px-3 py-2 rounded-r-lg text-right">Data</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {[
+                                    { name: 'Mario Rossi', date: '2023-10-26' },
+                                    { name: 'Under 14', date: '2023-10-26' }, // From design image
+                                    { name: 'Luisa Bianchi', date: '2023-10-25' },
+                                    { name: 'Prima Squadra', date: '2023-10-25' },
+                                    { name: 'Luca Verde', date: '2023-10-24' },
+                                ].map((row, i) => (
+                                    <tr key={i} className="group hover:bg-slate-50 transition-colors">
+                                        <td className="px-3 py-3 font-medium text-slate-700">{row.name}</td>
+                                        <td className="px-3 py-3 text-slate-500 text-right">{row.date}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Chart Widget (Simplistic implementation) */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col items-center justify-center">
+                    <h3 className="font-bold text-slate-800 mb-6 self-start">Stato Certificati</h3>
+                    <div className="relative w-40 h-40 rounded-full border-[12px] border-slate-100 flex items-center justify-center border-t-blue-500 border-r-blue-500 rotate-45">
+                        {/* CSS trick for donut chart */}
+                        <div className="absolute inset-0 rounded-full border-[12px] border-transparent border-l-blue-200 -rotate-90"></div>
+                        <span className="text-3xl font-bold text-blue-600 -rotate-45">75%</span>
+                    </div>
+                    <div className="flex items-center space-x-4 mt-6 text-xs text-slate-500">
+                        <div className="flex items-center"><span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span> In regola</div>
+                        <div className="flex items-center"><span className="w-2 h-2 bg-slate-200 rounded-full mr-1"></span> In Scadenza</div>
+                    </div>
+                </div>
+
+                {/* Utility Widget */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h3 className="font-bold text-slate-800 mb-4">Bozze News</h3>
+                    <div className="space-y-4">
+                        <div className="p-3 bg-slate-50 rounded-lg flex items-start space-x-3 cursor-pointer hover:bg-slate-100 transition-colors">
+                            <Calendar size={18} className="text-slate-400 mt-0.5" />
+                            <div>
+                                <p className="text-sm font-medium text-slate-700">Nuovo Campo in Arrivo!</p>
+                                <p className="text-xs text-slate-400 mt-1">Modificato 2 ore fa</p>
+                            </div>
+                        </div>
+                        <div className="p-3 bg-slate-50 rounded-lg flex items-start space-x-3 cursor-pointer hover:bg-slate-100 transition-colors">
+                            <Edit3 size={18} className="text-slate-400 mt-0.5" />
+                            <div>
+                                <p className="text-sm font-medium text-slate-700">Intervista al Coach Rosai 🔴</p>
+                                <p className="text-xs text-slate-400 mt-1">Bozza automatica</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Dashboard;

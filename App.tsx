@@ -5,6 +5,9 @@ import NewsDetails from './pages/NewsDetails';
 import Login from './backend/Login';
 import UpdatePassword from './backend/UpdatePassword';
 import AuthCallback from './components/AuthCallback';
+import ProtectedRoute from './components/ProtectedRoute';
+import DashboardLayout from './backend/DashboardLayout';
+import Dashboard from './backend/Dashboard';
 
 const App: React.FC = () => {
   return (
@@ -15,6 +18,14 @@ const App: React.FC = () => {
         <Route path="/news/:id" element={<NewsDetails />} />
         <Route path="/backend" element={<Login />} />
         <Route path="/update-password" element={<UpdatePassword />} />
+
+        {/* Protected Dashboard Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/backend" element={<DashboardLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            {/* Future routes: squadre, atleti, etc. */}
+          </Route>
+        </Route>
       </Routes>
     </HashRouter>
   );
