@@ -21,6 +21,7 @@ const ProtectedRoute = () => {
     }, []);
 
     if (hasSession === null) {
+        console.log("ProtectedRoute: Checking session...");
         // Loading state
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -30,9 +31,11 @@ const ProtectedRoute = () => {
     }
 
     if (!hasSession) {
+        console.warn("ProtectedRoute: No session found. Redirecting to /backend.");
         return <Navigate to="/backend" replace />;
     }
 
+    console.log("ProtectedRoute: Session valid. Rendering outlet.");
     return <Outlet />;
 };
 

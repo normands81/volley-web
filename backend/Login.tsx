@@ -25,7 +25,12 @@ const Login: React.FC = () => {
             }
 
             if (data.user) {
-                navigate('/backend/dashboard');
+                console.log("Login success! User:", data.user);
+                console.log("Navigating to /backend/dashboard...");
+                // Short timeout to ensure storage persistence
+                setTimeout(() => {
+                    navigate('/backend/dashboard');
+                }, 500);
             }
         } catch (err) {
             setError('Si è verificato un errore imprevisto.');
