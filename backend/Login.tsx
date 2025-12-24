@@ -25,7 +25,7 @@ const Login: React.FC = () => {
             }
 
             if (data.user) {
-                navigate('/');
+                navigate('/backend/dashboard');
             }
         } catch (err) {
             setError('Si è verificato un errore imprevisto.');
