@@ -35,7 +35,7 @@ const Dashboard: React.FC = () => {
                 // 1. Get the current active season
                 const { data: seasonData, error: seasonError } = await supabase
                     .from('TbSeasons')
-                    .select('id')
+                    .select('idseason')
                     .eq('active', true)
                     .eq('current', true)
                     .single();
@@ -50,7 +50,7 @@ const Dashboard: React.FC = () => {
                     const { count, error: countError } = await supabase
                         .from('TbTeams')
                         .select('*', { count: 'exact', head: true })
-                        .eq('idseason', seasonData.id);
+                        .eq('idseason', seasonData.idseason);
 
                     if (countError) {
                         console.error('Error counting teams:', countError);
