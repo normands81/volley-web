@@ -29,6 +29,7 @@ import { supabase } from '../services/supabaseClient';
 const Dashboard: React.FC = () => {
     const [teamsCount, setTeamsCount] = React.useState<number | null>(null);
     const [partnersCount, setPartnersCount] = React.useState<number | null>(null);
+    const [newsCount, setNewsCount] = React.useState<number | null>(null);
 
     React.useEffect(() => {
         const fetchStats = async () => {
@@ -70,6 +71,18 @@ const Dashboard: React.FC = () => {
                     } else {
                         setPartnersCount(partnerCount);
                     }
+
+                    // 4. Count news for this season
+                    const { count: newsCount, error: newsError } = await supabase
+                        .from('TbNews')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('idseason', seasonData.idseason);
+
+                    if (newsError) {
+                        console.error('Error counting news:', newsError);
+                    } else {
+                        setNewsCount(newsCount);
+                    }
                 }
             } catch (err) {
                 console.error('Unexpected error fetching dashboard stats:', err);
@@ -106,10 +119,10 @@ const Dashboard: React.FC = () => {
                 />
                 <StatCard
                     title="News"
-                    count="84"
-                    subtitle="Articolo pubblicati"
+                    count={newsCount !== null ? newsCount.toString() : "-"}
+                    subtitle="Articoli pubblicati"
                     icon={<Newspaper size={24} />}
-                    buttonText="Scrivi Post"
+                    buttonText="Nuovo Articolo"
                     buttonColor="bg-blue-500"
                 />
             </div>
