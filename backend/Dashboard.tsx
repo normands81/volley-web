@@ -28,6 +28,7 @@ import { supabase } from '../services/supabaseClient';
 
 const Dashboard: React.FC = () => {
     const [teamsCount, setTeamsCount] = React.useState<number | null>(null);
+    const [partnersCount, setPartnersCount] = React.useState<number | null>(null);
 
     React.useEffect(() => {
         const fetchStats = async () => {
@@ -47,15 +48,27 @@ const Dashboard: React.FC = () => {
 
                 if (seasonData) {
                     // 2. Count teams for this season
-                    const { count, error: countError } = await supabase
+                    const { count: teamCount, error: teamError } = await supabase
                         .from('TbTeams')
                         .select('*', { count: 'exact', head: true })
                         .eq('idseason', seasonData.idseason);
 
-                    if (countError) {
-                        console.error('Error counting teams:', countError);
+                    if (teamError) {
+                        console.error('Error counting teams:', teamError);
                     } else {
-                        setTeamsCount(count);
+                        setTeamsCount(teamCount);
+                    }
+
+                    // 3. Count partners for this season
+                    const { count: partnerCount, error: partnerError } = await supabase
+                        .from('TbPartners')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('idseason', seasonData.idseason);
+
+                    if (partnerError) {
+                        console.error('Error counting partners:', partnerError);
+                    } else {
+                        setPartnersCount(partnerCount);
                     }
                 }
             } catch (err) {
@@ -85,8 +98,8 @@ const Dashboard: React.FC = () => {
                 />
                 <StatCard
                     title="Sponsor"
-                    count="245"
-                    subtitle="Iscritti totali" // Placeholder text from design
+                    count={partnersCount !== null ? partnersCount.toString() : "-"}
+                    subtitle="Sponsor totali"
                     icon={<Users size={24} />}
                     buttonText="Rinnova"
                     buttonColor="bg-orange-500"
