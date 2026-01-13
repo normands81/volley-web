@@ -8,13 +8,20 @@ interface Season {
     current: boolean;
 }
 
+interface Team {
+    idteam: number;
+    description: string;
+    idseason: number;
+}
+
 interface AddTeamModalProps {
     isOpen: boolean;
     onClose: () => void;
     onTeamAdded: () => void;
+    initialData?: Team;
 }
 
-const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdded }) => {
+const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdded, initialData }) => {
     const [name, setName] = useState('');
     const [seasonId, setSeasonId] = useState<number | ''>('');
     const [seasons, setSeasons] = useState<Season[]>([]);
@@ -25,11 +32,16 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdde
     useEffect(() => {
         if (isOpen) {
             fetchSeasons();
-            setName('');
-            setSeasonId('');
+            if (initialData) {
+                setName(initialData.description);
+                setSeasonId(initialData.idseason);
+            } else {
+                setName('');
+                setSeasonId('');
+            }
             setError(null);
         }
-    }, [isOpen]);
+    }, [isOpen, initialData]);
 
     const fetchSeasons = async () => {
         try {
@@ -42,10 +54,13 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdde
             if (error) throw error;
 
             setSeasons(data || []);
-            // Auto-select current season if available
-            const currentSeason = data?.find((s: Season) => s.current);
-            if (currentSeason) {
-                setSeasonId(currentSeason.idseason);
+
+            // Only auto-select current season if we are NOT editing
+            if (!initialData) {
+                const currentSeason = data?.find((s: Season) => s.current);
+                if (currentSeason) {
+                    setSeasonId(currentSeason.idseason);
+                }
             }
         } catch (err: any) {
             console.error('Error fetching seasons:', err);
@@ -66,19 +81,32 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdde
             setLoading(true);
             setError(null);
 
-            const { error } = await supabase
-                .from('TbTeams')
-                .insert([
-                    { description: name, idseason: seasonId }
-                ]);
+            let error;
+
+            if (initialData) {
+                // Update existing team
+                const { error: updateError } = await supabase
+                    .from('TbTeams')
+                    .update({ description: name, idseason: seasonId })
+                    .eq('idteam', initialData.idteam);
+                error = updateError;
+            } else {
+                // Insert new team
+                const { error: insertError } = await supabase
+                    .from('TbTeams')
+                    .insert([
+                        { description: name, idseason: seasonId }
+                    ]);
+                error = insertError;
+            }
 
             if (error) throw error;
 
             onTeamAdded();
             onClose();
         } catch (err: any) {
-            console.error('Error adding team:', err);
-            setError(err.message || 'Errore durante l\'aggiunta della squadra.');
+            console.error('Error saving team:', err);
+            setError(err.message || 'Errore durante il salvataggio.');
         } finally {
             setLoading(false);
         }
@@ -90,7 +118,7 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdde
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden">
                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-lg font-bold text-gray-800">Nuova Squadra</h2>
+                    <h2 className="text-lg font-bold text-gray-800">{initialData ? 'Modifica Squadra' : 'Nuova Squadra'}</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
                         <X size={20} />
                     </button>

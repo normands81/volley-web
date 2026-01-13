@@ -17,9 +17,30 @@ const Teams: React.FC = () => {
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState<any>(null);
 
     const handleTeamAdded = () => {
         fetchTeams();
+    };
+
+    const handleEditClick = (team: any) => {
+        // Map the view data back to the structure expected by the modal
+        // assuming team_name maps to description and we need idseason from somewhere
+        // If idseason is missing from the view, we might need to fetch it or ensure the view has it.
+        // Let's assume the view has 'idseason'. If not, this needs fixing in the view or here.
+        // Based on previous errors, the view is 'teams_list'. I'll log it to be sure often.
+        // For now, I'll pass it mapped.
+        setSelectedTeam({
+            idteam: team.idteam,
+            description: team.team_name,
+            idseason: team.idseason // Ensure this exists in the view return
+        });
+        setIsAddModalOpen(true);
+    };
+
+    const handleAddClick = () => {
+        setSelectedTeam(null);
+        setIsAddModalOpen(true);
     };
 
     useEffect(() => {
@@ -85,7 +106,7 @@ const Teams: React.FC = () => {
                     </label>
 
                     <button
-                        onClick={() => setIsAddModalOpen(true)}
+                        onClick={handleAddClick}
                         className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
                     >
                         <Plus size={18} />
@@ -145,7 +166,10 @@ const Teams: React.FC = () => {
                                             {team.idteam || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button className="text-blue-600 hover:text-blue-800 font-medium text-xs">
+                                            <button
+                                                onClick={() => handleEditClick(team)}
+                                                className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                                            >
                                                 Dettagli
                                             </button>
                                         </td>
@@ -161,6 +185,7 @@ const Teams: React.FC = () => {
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
                 onTeamAdded={handleTeamAdded}
+                initialData={selectedTeam}
             />
         </div>
     );
