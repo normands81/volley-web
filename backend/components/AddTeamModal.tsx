@@ -45,7 +45,7 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdde
             // Auto-select current season if available
             const currentSeason = data?.find((s: Season) => s.current);
             if (currentSeason) {
-                setSeasonId(currentSeason.id);
+                setSeasonId(currentSeason.idseason);
             }
         } catch (err: any) {
             console.error('Error fetching seasons:', err);
