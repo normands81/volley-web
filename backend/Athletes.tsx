@@ -126,7 +126,8 @@ const Athletes: React.FC = () => {
                             <tr>
                                 <th className="px-6 py-4 font-semibold">Atleta</th>
                                 <th className="px-6 py-4 font-semibold">Squadra</th>
-                                <th className="px-6 py-4 font-semibold">Ruolo</th>
+                                <th className="px-6 py-4 font-semibold">Data di nascita</th>
+                                <th className="px-6 py-4 font-semibold">Scadenza certificato</th>
                                 <th className="px-6 py-4 font-semibold">Stagione</th>
                                 <th className="px-6 py-4 font-semibold text-right">Azioni</th>
                             </tr>
@@ -155,15 +156,18 @@ const Athletes: React.FC = () => {
                                                     <User size={16} />
                                                 </div>
                                                 <div>
-                                                    <div className="font-medium">{athlete.surname} {athlete.name}</div>
+                                                    <div className="font-medium">{athlete.lastname} {athlete.name}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
-                                            {athlete.team_name || '-'}
+                                            {athlete.team_description || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
-                                            {athlete.role || '-'}
+                                            {athlete.birth_date || '-'}
+                                        </td>
+                                        <td className="px-6 py-4 text-slate-600">
+                                            {athlete.certificate_duedate || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
                                             {athlete.season_description || '-'}
