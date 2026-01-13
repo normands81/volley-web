@@ -152,7 +152,7 @@ const Dashboard: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <StatCard
                         title="Atleti"
-                        count={teamsCount !== null ? teamsCount.toString() : "-"}
+                        count={athletesCount !== null ? athletesCount.toString() : "-"}
                         subtitle="Totale attivi"
                         icon={<Shield size={24} />}
                         buttonText="Gestisci"
