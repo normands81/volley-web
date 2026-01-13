@@ -67,7 +67,7 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdde
             setError(null);
 
             const { error } = await supabase
-                .from('Tbeams')
+                .from('TbTeams')
                 .insert([
                     { description: name, idseason: seasonId }
                 ]);
