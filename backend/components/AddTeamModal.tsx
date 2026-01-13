@@ -3,7 +3,7 @@ import { supabase } from '../../services/supabaseClient';
 import { X, Loader2 } from 'lucide-react';
 
 interface Season {
-    id: number;
+    idseason: number;
     description: string;
     current: boolean;
 }
@@ -128,7 +128,7 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdde
                         >
                             <option value="">Seleziona stagione</option>
                             {seasons.map((season) => (
-                                <option key={season.id} value={season.id}>
+                                <option key={season.idseason} value={season.idseason}>
                                     {season.description} {season.current ? '(Corrente)' : ''}
                                 </option>
                             ))}
