@@ -8,6 +8,7 @@ import AuthCallback from './components/AuthCallback';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './backend/DashboardLayout';
 import Dashboard from './backend/Dashboard';
+import Teams from './backend/Teams';
 
 const App: React.FC = () => {
   return (
@@ -23,7 +24,8 @@ const App: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/backend/dashboard" element={<Dashboard />} />
-            {/* Future routes: squadre, atleti, etc. */}
+            <Route path="/backend/squadre" element={<Teams />} />
+            {/* Future routes: atleti, etc. */}
           </Route>
         </Route>
       </Routes>

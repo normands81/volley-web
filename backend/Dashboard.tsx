@@ -106,7 +106,7 @@ const Dashboard: React.FC = () => {
                     count={teamsCount !== null ? teamsCount.toString() : "-"}
                     subtitle="Totale attive"
                     icon={<Shield size={24} />}
-                    buttonText="Aggiungi Nuova"
+                    buttonText="Gestisci"
                     buttonColor="bg-green-500"
                 />
                 <StatCard
@@ -114,7 +114,7 @@ const Dashboard: React.FC = () => {
                     count={partnersCount !== null ? partnersCount.toString() : "-"}
                     subtitle="Sponsor totali"
                     icon={<Users size={24} />}
-                    buttonText="Rinnova"
+                    buttonText="Gestisci"
                     buttonColor="bg-orange-500"
                 />
                 <StatCard
@@ -122,7 +122,7 @@ const Dashboard: React.FC = () => {
                     count={newsCount !== null ? newsCount.toString() : "-"}
                     subtitle="Articoli pubblicati"
                     icon={<Newspaper size={24} />}
-                    buttonText="Nuovo Articolo"
+                    buttonText="Gestisci"
                     buttonColor="bg-blue-500"
                 />
             </div>
