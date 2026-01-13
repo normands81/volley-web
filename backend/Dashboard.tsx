@@ -34,6 +34,7 @@ const Dashboard: React.FC = () => {
     const [teamsCount, setTeamsCount] = React.useState<number | null>(null);
     const [partnersCount, setPartnersCount] = React.useState<number | null>(null);
     const [newsCount, setNewsCount] = React.useState<number | null>(null);
+    const [athletesCount, setAthletesCount] = React.useState<number | null>(null);
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -88,6 +89,18 @@ const Dashboard: React.FC = () => {
                     } else {
                         setNewsCount(newsCount);
                     }
+
+                    // 5. Count athletes for this season
+                    const { count: athleteCount, error: athleteError } = await supabase
+                        .from('TbTeamsMembers')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('idseason', seasonData.idseason);
+
+                    if (athleteError) {
+                        console.error('Error counting athletes:', athleteError);
+                    } else {
+                        setAthletesCount(athleteCount);
+                    }
                 }
             } catch (err) {
                 console.error('Unexpected error fetching dashboard stats:', err);
@@ -137,31 +150,15 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Recent Athletes */}
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                    <h3 className="font-bold text-slate-800 mb-4">Ultimi Atleti Iscritti</h3>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-slate-400 uppercase bg-slate-50">
-                                <tr>
-                                    <th className="px-3 py-2 rounded-l-lg">Nome</th>
-                                    <th className="px-3 py-2 rounded-r-lg text-right">Data</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {[
-                                    { name: 'Mario Rossi', date: '2023-10-26' },
-                                    { name: 'Under 14', date: '2023-10-26' }, // From design image
-                                    { name: 'Luisa Bianchi', date: '2023-10-25' },
-                                    { name: 'Prima Squadra', date: '2023-10-25' },
-                                    { name: 'Luca Verde', date: '2023-10-24' },
-                                ].map((row, i) => (
-                                    <tr key={i} className="group hover:bg-slate-50 transition-colors">
-                                        <td className="px-3 py-3 font-medium text-slate-700">{row.name}</td>
-                                        <td className="px-3 py-3 text-slate-500 text-right">{row.date}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <StatCard
+                        title="Atleti"
+                        count={teamsCount !== null ? teamsCount.toString() : "-"}
+                        subtitle="Totale attivi"
+                        icon={<Shield size={24} />}
+                        buttonText="Gestisci"
+                        buttonColor="bg-yellow-500"
+                        onClick={() => navigate('/backend/atleti')}
+                    />
                 </div>
 
                 {/* Chart Widget (Simplistic implementation) */}
