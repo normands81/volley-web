@@ -7,8 +7,9 @@ import {
     ArrowRight,
     Edit3
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const StatCard = ({ title, count, subtitle, icon, buttonText, buttonColor }: any) => (
+const StatCard = ({ title, count, subtitle, icon, buttonText, buttonColor, onClick }: any) => (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
         <div className="mb-4 text-slate-400 bg-slate-50 p-3 rounded-full">
             {icon}
@@ -17,7 +18,10 @@ const StatCard = ({ title, count, subtitle, icon, buttonText, buttonColor }: any
         <p className="text-4xl font-bold text-slate-800 mb-2">{count}</p>
         <span className="text-xs text-slate-400 mb-6">{subtitle}</span>
 
-        <button className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 ${buttonColor}`}>
+        <button
+            onClick={onClick}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 ${buttonColor}`}
+        >
             <span>{buttonText}</span>
             <ArrowRight size={16} />
         </button>
@@ -30,6 +34,7 @@ const Dashboard: React.FC = () => {
     const [teamsCount, setTeamsCount] = React.useState<number | null>(null);
     const [partnersCount, setPartnersCount] = React.useState<number | null>(null);
     const [newsCount, setNewsCount] = React.useState<number | null>(null);
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         const fetchStats = async () => {
@@ -108,6 +113,7 @@ const Dashboard: React.FC = () => {
                     icon={<Shield size={24} />}
                     buttonText="Gestisci"
                     buttonColor="bg-green-500"
+                    onClick={() => navigate('/backend/squadre')}
                 />
                 <StatCard
                     title="Sponsor"
