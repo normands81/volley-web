@@ -35,7 +35,7 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onTeamAdde
         try {
             setLoadingSeasons(true);
             const { data, error } = await supabase
-                .from('seasons')
+                .from('TbSeasons')
                 .select('*')
                 .order('description', { ascending: false });
 
