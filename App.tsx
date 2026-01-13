@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './backend/DashboardLayout';
 import Dashboard from './backend/Dashboard';
 import Teams from './backend/Teams';
+import Athletes from './backend/Athletes';
 
 const App: React.FC = () => {
   return (
@@ -25,7 +26,7 @@ const App: React.FC = () => {
           <Route element={<DashboardLayout />}>
             <Route path="/backend/dashboard" element={<Dashboard />} />
             <Route path="/backend/squadre" element={<Teams />} />
-            {/* Future routes: atleti, etc. */}
+            <Route path="/backend/atleti" element={<Athletes />} />
           </Route>
         </Route>
       </Routes>
