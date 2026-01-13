@@ -51,7 +51,7 @@ const Teams: React.FC = () => {
         try {
             setLoading(true);
             let query = supabase
-                .from('teams_list')
+                .from('vw_teams_list')
                 .select('*');
 
             if (onlyCurrentSeason) {

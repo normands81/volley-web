@@ -18,10 +18,11 @@ async function checkData() {
         console.log('Seasons:', seasons);
     }
 
-    console.log('\nChecking TbTeams...');
+    console.log('\nChecking vw_teams_list...');
     const { data: teams, error: teamsError } = await supabase
-        .from('TbTeams')
-        .select('*');
+        .from('vw_teams_list')
+        .select('*')
+        .limit(1);
 
     if (teamsError) {
         console.error('Error fetching teams:', teamsError);
