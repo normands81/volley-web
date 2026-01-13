@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import { Shield, AlertCircle, Search, Filter } from 'lucide-react';
+import { Shield, AlertCircle, Search, Filter, Plus } from 'lucide-react';
 import { useDebounce } from '../utils';
+import AddTeamModal from './components/AddTeamModal';
 
 const Teams: React.FC = () => {
     const [teams, setTeams] = useState<any[]>([]);
@@ -14,6 +15,12 @@ const Teams: React.FC = () => {
 
     // Debounce search term to avoid too many requests
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+    const handleTeamAdded = () => {
+        fetchTeams();
+    };
 
     useEffect(() => {
         fetchTeams();
@@ -76,6 +83,14 @@ const Teams: React.FC = () => {
                         />
                         <span className="text-sm font-medium text-slate-700">Stagione corrente</span>
                     </label>
+
+                    <button
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
+                    >
+                        <Plus size={18} />
+                        <span className="font-medium text-sm">Nuova Squadra</span>
+                    </button>
                 </div>
             </div>
 
@@ -141,6 +156,12 @@ const Teams: React.FC = () => {
                     </table>
                 </div>
             </div>
+
+            <AddTeamModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onTeamAdded={handleTeamAdded}
+            />
         </div>
     );
 };
