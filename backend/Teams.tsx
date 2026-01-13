@@ -16,7 +16,8 @@ const Teams: React.FC = () => {
             setLoading(true);
             const { data, error } = await supabase
                 .from('teams_list')
-                .select('*');
+                .select('*')
+                .eq('current', true);
 
             if (error) throw error;
             setTeams(data || []);
@@ -80,14 +81,14 @@ const Teams: React.FC = () => {
                                                 <div className="p-2 bg-slate-100 rounded-lg text-slate-500">
                                                     <Shield size={16} />
                                                 </div>
-                                                <span>{team.team_description || team.description || 'N/A'}</span>
+                                                <span>{team.team_name || team.team_name || 'N/A'}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
-                                            {team.category_description || '-'}
+                                            {team.season_description || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
-                                            {team.season_description || '-'}
+                                            {team.idteam || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <button className="text-blue-600 hover:text-blue-800 font-medium text-xs">
