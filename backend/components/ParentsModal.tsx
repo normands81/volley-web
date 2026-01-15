@@ -84,6 +84,22 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
             return;
         }
 
+        // Phone validation: allows +, digits, spaces, dashes. Min length 8.
+        const phoneRegex = /^\+?[\d\s-]{8,}$/;
+        if (!phoneRegex.test(phoneNumber)) {
+            setError('Inserisci un numero di telefono valido.');
+            return;
+        }
+
+        // Email validation if present
+        if (email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                setError('Inserisci un indirizzo email valido.');
+                return;
+            }
+        }
+
         try {
             setSubmitting(true);
             const newParent = {
