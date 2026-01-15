@@ -12,6 +12,7 @@ const Athletes: React.FC = () => {
     // Filters
     const [searchTerm, setSearchTerm] = useState('');
     const [onlyCurrentSeason, setOnlyCurrentSeason] = useState(true);
+    const [onlyActive, setOnlyActive] = useState(true);
 
     // Debounce search term to avoid too many requests
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -35,7 +36,7 @@ const Athletes: React.FC = () => {
 
     useEffect(() => {
         fetchAthletes();
-    }, [debouncedSearchTerm, onlyCurrentSeason]);
+    }, [debouncedSearchTerm, onlyCurrentSeason, onlyActive]);
 
     const fetchAthletes = async () => {
         try {
@@ -47,6 +48,10 @@ const Athletes: React.FC = () => {
             if (onlyCurrentSeason) {
                 // Assuming the view has a 'current' field for the season like vw_teams_list
                 query = query.eq('current', true);
+            }
+
+            if (onlyActive) {
+                query = query.eq('active', true);
             }
 
             if (debouncedSearchTerm) {
@@ -94,6 +99,16 @@ const Athletes: React.FC = () => {
                             className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                         />
                         <span className="text-sm font-medium text-slate-700">Stagione corrente</span>
+                    </label>
+
+                    <label className="flex items-center space-x-2 px-4 py-2 border border-slate-200 rounded-lg bg-white cursor-pointer hover:bg-slate-50 select-none">
+                        <input
+                            type="checkbox"
+                            checked={onlyActive}
+                            onChange={(e) => setOnlyActive(e.target.checked)}
+                            className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-slate-700">Solo attivi</span>
                     </label>
 
                     <button
