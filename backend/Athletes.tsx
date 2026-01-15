@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import { Shield, AlertCircle, Search, User, Plus } from 'lucide-react';
+import { Shield, AlertCircle, Search, User, Plus, Pencil, Trash2, RotateCcw } from 'lucide-react';
 import { useDebounce } from '../utils';
 import AddAthleteModal from './components/AddAthleteModal';
 
@@ -27,6 +27,35 @@ const Athletes: React.FC = () => {
     const handleEditClick = (athlete: any) => {
         setSelectedAthlete(athlete);
         setIsAddModalOpen(true);
+    };
+
+    const handleToggleActive = async (athlete: any) => {
+        const action = athlete.active ? "cancellare" : "ripristinare";
+        if (!window.confirm(`Sei sicuro di voler ${action} questo atleta?`)) {
+            return;
+        }
+
+        const id = athlete.idteammember || athlete.idmember || athlete.id;
+        if (!id) {
+            console.error("ID not found for athlete", athlete);
+            alert("Impossibile trovare l'ID dell'atleta.");
+            return;
+        }
+
+        try {
+            const newActive = !athlete.active;
+            const { error } = await supabase
+                .from('TbTeamsMembers')
+                .update({ active: newActive })
+                .eq('idteammember', id);
+
+            if (error) throw error;
+
+            fetchAthletes();
+        } catch (err: any) {
+            console.error("Error toggling active status", err);
+            alert("Errore durante l'aggiornamento: " + err.message);
+        }
     };
 
     const handleAddClick = () => {
@@ -190,12 +219,29 @@ const Athletes: React.FC = () => {
                                             {athlete.season_description || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button
-                                                onClick={() => handleEditClick(athlete)}
-                                                className="text-blue-600 hover:text-blue-800 font-medium text-xs"
-                                            >
-                                                Dettagli
-                                            </button>
+                                            <div className="flex items-center justify-end space-x-2">
+                                                <button
+                                                    onClick={() => handleEditClick(athlete)}
+                                                    className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                                    title="Modifica"
+                                                >
+                                                    <Pencil size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleToggleActive(athlete)}
+                                                    className={`p-1 rounded transition-colors ${athlete.active
+                                                        ? "text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                        : "text-green-600 hover:text-green-800 hover:bg-green-50"
+                                                        }`}
+                                                    title={athlete.active ? "Disattiva" : "Ripristina"}
+                                                >
+                                                    {athlete.active ? (
+                                                        <Trash2 size={18} />
+                                                    ) : (
+                                                        <RotateCcw size={18} />
+                                                    )}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
