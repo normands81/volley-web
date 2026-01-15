@@ -5,7 +5,7 @@ import { X, Loader2, Plus, Trash2, Phone, Mail, User } from 'lucide-react';
 interface Parent {
     idparent: number;
     name: string;
-    surname: string;
+    lastname: string;
     email: string | null;
     phone_number: string;
     idteammember: number;
@@ -27,7 +27,7 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
     // Form state
     const [showForm, setShowForm] = useState(false);
     const [name, setName] = useState('');
-    const [surname, setSurname] = useState('');
+    const [lastname, setLastname] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
 
@@ -59,7 +59,7 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
 
     const resetForm = () => {
         setName('');
-        setSurname('');
+        setLastname('');
         setEmail('');
         setPhoneNumber('');
         setError(null);
@@ -79,7 +79,7 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
         e.preventDefault();
         if (!athleteId) return;
 
-        if (!name || !surname || !phoneNumber) {
+        if (!name || !lastname || !phoneNumber) {
             setError('Nome, Cognome e Telefono sono obbligatori.');
             return;
         }
@@ -88,7 +88,7 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
             setSubmitting(true);
             const newParent = {
                 name,
-                surname,
+                lastname,
                 email: email || null,
                 phone_number: phoneNumber,
                 idteammember: athleteId
@@ -166,7 +166,7 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
                                     {parents.map((p) => (
                                         <div key={p.idparent} className="p-4 border border-gray-100 rounded-lg bg-gray-50 flex justify-between items-start group hover:border-blue-200 transition-colors">
                                             <div>
-                                                <h4 className="font-bold text-gray-800">{p.name} {p.surname}</h4>
+                                                <h4 className="font-bold text-gray-800">{p.name} {p.lastname}</h4>
                                                 <div className="space-y-1 mt-2">
                                                     {p.phone_number && (
                                                         <div className="flex items-center text-sm text-gray-600">
@@ -220,8 +220,8 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Cognome *</label>
                                     <input
                                         type="text"
-                                        value={surname}
-                                        onChange={(e) => setSurname(e.target.value)}
+                                        value={lastname}
+                                        onChange={(e) => setLastname(e.target.value)}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         required
                                     />
