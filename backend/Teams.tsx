@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import { Shield, AlertCircle, Search, Filter, Plus } from 'lucide-react';
+import { Shield, AlertCircle, Search, Filter, Plus, Pencil } from 'lucide-react';
 import { useDebounce } from '../utils';
 import AddTeamModal from './components/AddTeamModal';
 
@@ -166,12 +166,15 @@ const Teams: React.FC = () => {
                                             {team.idteam || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button
-                                                onClick={() => handleEditClick(team)}
-                                                className="text-blue-600 hover:text-blue-800 font-medium text-xs"
-                                            >
-                                                Dettagli
-                                            </button>
+                                            <div className="flex items-center justify-end space-x-2">
+                                                <button
+                                                    onClick={() => handleEditClick(team)}
+                                                    className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                                    title="Modifica"
+                                                >
+                                                    <Pencil size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -187,7 +190,7 @@ const Teams: React.FC = () => {
                 onTeamAdded={handleTeamAdded}
                 initialData={selectedTeam}
             />
-        </div>
+        </div >
     );
 };
 
