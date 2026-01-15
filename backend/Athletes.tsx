@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import { Shield, AlertCircle, Search, User, Plus, Pencil, Trash2, RotateCcw } from 'lucide-react';
+import { Shield, AlertCircle, Search, User, Plus, Pencil, Trash2, RotateCcw, Users } from 'lucide-react';
 import { useDebounce } from '../utils';
 import AddAthleteModal from './components/AddAthleteModal';
+import ParentsModal from './components/ParentsModal';
 
 const Athletes: React.FC = () => {
     const [athletes, setAthletes] = useState<any[]>([]);
@@ -18,10 +19,16 @@ const Athletes: React.FC = () => {
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isParentsModalOpen, setIsParentsModalOpen] = useState(false);
     const [selectedAthlete, setSelectedAthlete] = useState<any>(null);
 
     const handleAthleteAdded = () => {
         fetchAthletes();
+    };
+
+    const handleParentsClick = (athlete: any) => {
+        setSelectedAthlete(athlete);
+        setIsParentsModalOpen(true);
     };
 
     const handleEditClick = (athlete: any) => {
@@ -221,6 +228,13 @@ const Athletes: React.FC = () => {
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end space-x-2">
                                                 <button
+                                                    onClick={() => handleParentsClick(athlete)}
+                                                    className="p-1 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors"
+                                                    title="Genitori"
+                                                >
+                                                    <Users size={18} />
+                                                </button>
+                                                <button
                                                     onClick={() => handleEditClick(athlete)}
                                                     className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                                                     title="Modifica"
@@ -256,6 +270,13 @@ const Athletes: React.FC = () => {
                 onClose={() => setIsAddModalOpen(false)}
                 onAthleteAdded={handleAthleteAdded}
                 initialData={selectedAthlete}
+            />
+
+            <ParentsModal
+                isOpen={isParentsModalOpen}
+                onClose={() => setIsParentsModalOpen(false)}
+                athleteId={selectedAthlete?.idteammember || selectedAthlete?.idmember || selectedAthlete?.id}
+                athleteName={`${selectedAthlete?.name} ${selectedAthlete?.lastname}`}
             />
         </div>
     );
