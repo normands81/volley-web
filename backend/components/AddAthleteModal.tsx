@@ -7,6 +7,12 @@ interface Team {
     description: string;
 }
 
+interface Season {
+    idseason: number;
+    description: string;
+    current: boolean;
+}
+
 interface AddAthleteModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -24,11 +30,14 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
     const [photo, setPhoto] = useState<File | null>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-    // Dropdown data
+    // State for seasons and teams
+    const [seasons, setSeasons] = useState<Season[]>([]);
+    const [seasonId, setSeasonId] = useState<number | ''>('');
     const [teams, setTeams] = useState<Team[]>([]);
 
     // Status
     const [loading, setLoading] = useState(false);
+    const [teamsLoading, setTeamsLoading] = useState(false);
     const [formLoading, setFormLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +45,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
 
     useEffect(() => {
         if (isOpen) {
-            fetchTeams();
+            fetchSeasons();
             if (initialData) {
                 // Populate fields
                 setName(initialData.name || '');
@@ -44,6 +53,12 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 setBirthDate(initialData.birth_date || '');
                 setCertificateDueDate(initialData.certificate_duedate || '');
                 setNumber(initialData.number || ''); // Check if view uses 'number' or 'jersey_number'
+
+                // Set season if available in initialData
+                if (initialData.idseason) {
+                    setSeasonId(initialData.idseason);
+                }
+
                 setTeamId(initialData.idteam || '');
                 setPhotoPreview(initialData.photo_url || initialData.photo || null);
             } else {
@@ -53,6 +68,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 setBirthDate('');
                 setCertificateDueDate('');
                 setNumber('');
+                setSeasonId('');
                 setTeamId('');
                 setPhoto(null);
                 setPhotoPreview(null);
@@ -61,37 +77,61 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
         }
     }, [isOpen, initialData]);
 
-    const fetchTeams = async () => {
+    // Fetch teams when seasonId changes
+    useEffect(() => {
+        if (seasonId) {
+            fetchTeams(Number(seasonId));
+        } else {
+            setTeams([]);
+            if (!initialData) setTeamId(''); // Reset team selection if changing season (unless editing initial load might differ, but generally safer)
+        }
+    }, [seasonId]);
+
+    const fetchSeasons = async () => {
         try {
             setLoading(true);
-
-            // 1. Get current season
-            const { data: seasonData, error: seasonError } = await supabase
+            // Fetch all active seasons
+            const { data, error } = await supabase
                 .from('TbSeasons')
-                .select('idseason')
-                .eq('current', true)
-                .single();
+                .select('idseason, description, current')
+                .eq('active', true)
+                .order('description', { ascending: false });
 
-            if (seasonError) throw seasonError;
-            if (!seasonData) throw new Error("No active season found");
+            if (error) throw error;
+            setSeasons(data || []);
 
-            // 2. Get teams for this season
+            // If not editing and no season selected, select current season default
+            if (!initialData && data) {
+                const current = data.find((s: Season) => s.current);
+                if (current) {
+                    setSeasonId(current.idseason);
+                }
+            }
+        } catch (err: any) {
+            console.error('Error fetching seasons:', err);
+            setError('Impossibile caricare le stagioni.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchTeams = async (selectedSeasonId: number) => {
+        try {
+            setTeamsLoading(true);
             const { data: teamsData, error: teamsError } = await supabase
                 .from('TbTeams')
-                .select('idteam, description') // description usually maps to team_name
-                .eq('idseason', seasonData.idseason)
+                .select('idteam, description')
+                .eq('idseason', selectedSeasonId)
                 .order('description');
 
             if (teamsError) throw teamsError;
 
-            // Map description to standardized structure if needed, but the interface matches
             setTeams(teamsData || []);
-
         } catch (err: any) {
             console.error('Error fetching teams:', err);
             setError('Impossibile caricare le squadre.');
         } finally {
-            setLoading(false);
+            setTeamsLoading(false);
         }
     };
 
@@ -117,8 +157,8 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!name || !lastname || !teamId) {
-            setError('Nome, Cognome e Squadra sono obbligatori.');
+        if (!name || !lastname || !teamId || !seasonId) {
+            setError('Nome, Cognome, Stagione e Squadra sono obbligatori.');
             return;
         }
 
@@ -126,7 +166,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
             setFormLoading(true);
             setError(null);
 
-            let photoUrl = initialData?.photo || null; // standard field name 'photo'
+            let photoUrl = initialData?.photo || null;
 
             // Upload photo if a new one is selected
             if (photo) {
@@ -134,15 +174,13 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
                 const filePath = `${fileName}`;
 
-                // Supabase bucket 'athletes'
+                // Supabase bucket 'athletes' (as per user edit)
                 const { error: uploadError } = await supabase.storage
                     .from('athletes')
                     .upload(filePath, photo);
 
                 if (uploadError) {
-                    // Fallback check: try creating bucket? (Can't via client usually)
                     console.error("Upload error", uploadError);
-                    // If bucket doesn't exist this will fail.
                     throw new Error(`Upload fallito: ${uploadError.message}`);
                 }
 
@@ -164,16 +202,16 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 number: number || null,
                 idteam: teamId,
                 photo: photoUrl
+                // Note: idseason is usually inferred from idteam in the backend/DB if normalized,
+                // but if TbTeamsMembers doesn't store idseason, we don't send it. 
+                // Based on standard schema, Member -> Team -> Season.
             };
 
             let error;
             if (initialData) {
                 // Update
-                // We need to know the primary key (idmember? idathlete?)
-                // The view 'vw_teammembers_list' typically joins things.
-                // Assuming the PK is passed in initialData or we can infer it.
-                // Let's assume 'idmember'.
-                const id = initialData.idmember || initialData.id;
+                // using idteammember as per user edit to schema/view
+                const id = initialData.idteammember || initialData.idmember || initialData.id;
 
                 if (!id) throw new Error("ID atleta mancante per la modifica");
 
@@ -276,6 +314,27 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                         />
                     </div>
 
+                    {/* Season Dropdown */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Stagione *</label>
+                        <select
+                            value={seasonId}
+                            onChange={(e) => setSeasonId(Number(e.target.value))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                            disabled={loading}
+                        >
+                            <option value="">Seleziona una stagione</option>
+                            {seasons.map((season) => (
+                                <option key={season.idseason} value={season.idseason}>
+                                    {season.description} {season.current ? '(Corrente)' : ''}
+                                </option>
+                            ))}
+                        </select>
+                        {loading && <p className="text-xs text-slate-500 mt-1">Caricamento stagioni...</p>}
+                    </div>
+
+                    {/* Team Dropdown */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Squadra *</label>
                         <select
@@ -283,7 +342,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                             onChange={(e) => setTeamId(Number(e.target.value))}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
-                            disabled={loading}
+                            disabled={teamsLoading || !seasonId}
                         >
                             <option value="">Seleziona una squadra</option>
                             {teams.map((team) => (
@@ -292,7 +351,8 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                                 </option>
                             ))}
                         </select>
-                        {loading && <p className="text-xs text-slate-500 mt-1">Caricamento squadre...</p>}
+                        {teamsLoading && <p className="text-xs text-slate-500 mt-1">Caricamento squadre...</p>}
+                        {!seasonId && <p className="text-xs text-amber-500 mt-1">Seleziona prima una stagione</p>}
                     </div>
 
                     <div>
@@ -347,7 +407,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                     </button>
                     <button
                         onClick={handleSubmit}
-                        disabled={formLoading || loading}
+                        disabled={formLoading || loading || teamsLoading}
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm flex items-center disabled:opacity-50"
                     >
                         {formLoading ? (
