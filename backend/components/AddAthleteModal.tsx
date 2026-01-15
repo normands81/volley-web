@@ -201,10 +201,8 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 certificate_duedate: certificateDueDate || null,
                 number: number || null,
                 idteam: teamId,
-                photo: photoUrl
-                // Note: idseason is usually inferred from idteam in the backend/DB if normalized,
-                // but if TbTeamsMembers doesn't store idseason, we don't send it. 
-                // Based on standard schema, Member -> Team -> Season.
+                photo: photoUrl,
+                idseason: seasonId
             };
 
             let error;
