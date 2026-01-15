@@ -5,7 +5,8 @@ import {
     Newspaper,
     Calendar,
     ArrowRight,
-    Edit3
+    Edit3,
+    Banknote
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -132,7 +133,7 @@ const Dashboard: React.FC = () => {
                     title="Sponsor"
                     count={partnersCount !== null ? partnersCount.toString() : "-"}
                     subtitle="Sponsor totali"
-                    icon={<Users size={24} />}
+                    icon={<Banknote size={24} />}
                     buttonText="Gestisci"
                     buttonColor="bg-orange-500"
                 />
@@ -154,7 +155,7 @@ const Dashboard: React.FC = () => {
                         title="Atleti"
                         count={athletesCount !== null ? athletesCount.toString() : "-"}
                         subtitle="Totale attivi"
-                        icon={<Shield size={24} />}
+                        icon={<Users size={24} />}
                         buttonText="Gestisci"
                         buttonColor="bg-yellow-500"
                         onClick={() => navigate('/backend/atleti')}
