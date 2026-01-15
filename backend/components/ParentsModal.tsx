@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../services/supabaseClient';
-import { X, Loader2, Plus, Trash2, Phone, Mail, FileText, User } from 'lucide-react';
+import { X, Loader2, Plus, Trash2, Phone, Mail, User } from 'lucide-react';
 
 interface Parent {
     idparent: number;
     name: string;
     surname: string;
     email: string | null;
-    phone_number: string | null;
-    note: string | null;
+    phone_number: string;
     idteammember: number;
 }
 
@@ -31,7 +30,6 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
     const [surname, setSurname] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [note, setNote] = useState('');
 
     useEffect(() => {
         if (isOpen && athleteId) {
@@ -64,7 +62,6 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
         setSurname('');
         setEmail('');
         setPhoneNumber('');
-        setNote('');
         setError(null);
     };
 
@@ -82,8 +79,8 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
         e.preventDefault();
         if (!athleteId) return;
 
-        if (!name || !surname) {
-            setError('Nome e Cognome sono obbligatori.');
+        if (!name || !surname || !phoneNumber) {
+            setError('Nome, Cognome e Telefono sono obbligatori.');
             return;
         }
 
@@ -93,8 +90,7 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
                 name,
                 surname,
                 email: email || null,
-                phone_number: phoneNumber || null,
-                note: note || null,
+                phone_number: phoneNumber,
                 idteammember: athleteId
             };
 
@@ -184,12 +180,6 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
                                                             <a href={`mailto:${p.email}`} className="hover:text-blue-600">{p.email}</a>
                                                         </div>
                                                     )}
-                                                    {p.note && (
-                                                        <div className="flex items-start text-sm text-gray-500 mt-2 pt-2 border-t border-gray-200">
-                                                            <FileText size={14} className="mr-2 text-gray-400 mt-0.5" />
-                                                            <span className="italic">{p.note}</span>
-                                                        </div>
-                                                    )}
                                                 </div>
                                             </div>
                                             <button
@@ -239,12 +229,13 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Telefono</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Telefono *</label>
                                 <input
                                     type="tel"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
                                 />
                             </div>
 
@@ -255,16 +246,6 @@ const ParentsModal: React.FC<ParentsModalProps> = ({ isOpen, onClose, athleteId,
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Note</label>
-                                <textarea
-                                    value={note}
-                                    onChange={(e) => setNote(e.target.value)}
-                                    rows={2}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                 />
                             </div>
 

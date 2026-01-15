@@ -228,18 +228,18 @@ const Athletes: React.FC = () => {
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end space-x-2">
                                                 <button
-                                                    onClick={() => handleParentsClick(athlete)}
-                                                    className="p-1 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors"
-                                                    title="Genitori"
-                                                >
-                                                    <Users size={18} />
-                                                </button>
-                                                <button
                                                     onClick={() => handleEditClick(athlete)}
                                                     className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                                                     title="Modifica"
                                                 >
                                                     <Pencil size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleParentsClick(athlete)}
+                                                    className="p-1 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors"
+                                                    title="Genitori"
+                                                >
+                                                    <Users size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleToggleActive(athlete)}
