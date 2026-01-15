@@ -195,7 +195,7 @@ const Athletes: React.FC = () => {
                                 </tr>
                             ) : (
                                 athletes.map((athlete, index) => (
-                                    <tr key={index} className="group hover:bg-slate-50 transition-colors">
+                                    <tr key={index} className={`group transition-colors ${!athlete.active ? 'bg-yellow-50 hover:bg-yellow-100' : 'hover:bg-slate-50'}`}>
                                         <td className="px-6 py-4 font-medium text-slate-700">
                                             <div className="flex items-center space-x-3">
                                                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
