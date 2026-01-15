@@ -104,7 +104,7 @@ const Home: React.FC = () => {
               <div key={item.idnews} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
                 <div className="h-48 overflow-hidden">
                   <img
-                    src={item.image ? getAssetPath(item.image) : getButtonBg()}
+                    src={item.image ? (item.image.startsWith('http') ? item.image : getAssetPath(item.image)) : getButtonBg()}
                     alt={item.title}
                     className="w-full h-full object-cover transform hover:scale-110 transition duration-500"
                     onError={(e) => {
@@ -137,7 +137,18 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {teams.map((team) => (
               <div key={team.idteam} className="group relative rounded-xl overflow-hidden cursor-pointer h-40">
-                <img src={getButtonBg()} alt={team.description} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                <img
+                  src={team.photo ? (team.photo.startsWith('http') ? team.photo : getAssetPath(team.photo)) : getButtonBg()}
+                  alt={team.description}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    const fallback = getButtonBg();
+                    if (!target.src.endsWith(fallback)) {
+                      target.src = fallback;
+                    }
+                  }}
+                />
                 <div className="absolute inset-0 bg-blue-900/60 group-hover:bg-blue-900/40 transition flex items-center justify-center">
                   <h3 className="text-white font-black text-xl md:text-2xl uppercase tracking-wider border-2 border-white px-4 py-2">{team.description}</h3>
                 </div>
@@ -156,7 +167,7 @@ const Home: React.FC = () => {
                     <h3 className="text-libertas-blue font-serif font-bold text-[10px] uppercase tracking-wide leading-tight px-2 text-center">{partner.description}</h3>
                   </div>
                   <img
-                    src={partner.logo ? getAssetPath(partner.logo) : getButtonBg()}
+                    src={partner.logo ? (partner.logo.startsWith('http') ? partner.logo : getAssetPath(partner.logo)) : getButtonBg()}
                     alt={partner.description}
                     className="w-full h-full object-contain p-2 transition-all duration-300 group-hover:pt-6 group-hover:opacity-100"
                     onError={(e) => {

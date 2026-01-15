@@ -42,6 +42,7 @@ export interface Team {
   description: string;
   idseason: number;
   season?: Season;
+  photo?: string;
 }
 
 export interface Partner {

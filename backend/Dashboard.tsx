@@ -136,6 +136,7 @@ const Dashboard: React.FC = () => {
                     icon={<Banknote size={24} />}
                     buttonText="Gestisci"
                     buttonColor="bg-orange-500"
+                    onClick={() => navigate('/backend/sponsor')}
                 />
                 <StatCard
                     title="News"
