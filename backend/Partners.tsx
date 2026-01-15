@@ -188,7 +188,11 @@ const Partners: React.FC = () => {
                                             <div className="flex items-center space-x-3">
                                                 <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 p-1">
                                                     {partner.logo ? (
-                                                        <img src={partner.logo} alt={partner.partner_description} className="w-full h-full object-contain" />
+                                                        <img
+                                                            src={partner.logo.startsWith('http') ? partner.logo : getAssetPath(partner.logo)}
+                                                            alt={partner.partner_description}
+                                                            className="w-full h-full object-contain"
+                                                        />
                                                     ) : (
                                                         <Banknote size={20} className="text-slate-400" />
                                                     )}
