@@ -17,8 +17,7 @@ interface AddNewsModalProps {
 
 const AddNewsModal: React.FC<AddNewsModalProps> = ({ isOpen, onClose, onNewsAdded, initialData }) => {
     const [title, setTitle] = useState('');
-    const [subtitle, setSubtitle] = useState('');
-    const [content, setContent] = useState('');
+    const [description, setDescription] = useState('');
     const [eventDate, setEventDate] = useState('');
     const [published, setPublished] = useState(true);
 
@@ -39,16 +38,14 @@ const AddNewsModal: React.FC<AddNewsModalProps> = ({ isOpen, onClose, onNewsAdde
             fetchSeasons();
             if (initialData) {
                 setTitle(initialData.title || '');
-                setSubtitle(initialData.subtitle || '');
-                setContent(initialData.content || '');
+                setDescription(initialData.description || '');
                 setEventDate(initialData.event_date || '');
                 setPublished(initialData.published ?? true); // Default to true if undefined, but respect false
                 setSeasonId(initialData.idseason || '');
                 setPhotoPreview(initialData.photo || null);
             } else {
                 setTitle('');
-                setSubtitle('');
-                setContent('');
+                setDescription('');
                 setEventDate(new Date().toISOString().split('T')[0]); // Default to today
                 setPublished(true);
                 setSeasonId('');
@@ -140,8 +137,7 @@ const AddNewsModal: React.FC<AddNewsModalProps> = ({ isOpen, onClose, onNewsAdde
 
             const newsData = {
                 title,
-                subtitle,
-                content,
+                description,
                 event_date: eventDate,
                 published,
                 idseason: seasonId,
@@ -212,20 +208,10 @@ const AddNewsModal: React.FC<AddNewsModalProps> = ({ isOpen, onClose, onNewsAdde
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Sottotitolo</label>
-                            <input
-                                type="text"
-                                value={subtitle}
-                                onChange={(e) => setSubtitle(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Contenuto</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Descrizione</label>
                             <textarea
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 rows={6}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />

@@ -277,7 +277,7 @@ const News: React.FC = () => {
                                                 </div>
                                                 <div>
                                                     <div className="font-medium line-clamp-1" title={item.title}>{item.title}</div>
-                                                    <div className="text-xs text-slate-500 line-clamp-1">{item.subtitle}</div>
+                                                    <div className="text-xs text-slate-500 line-clamp-1">{item.description}</div>
                                                 </div>
                                             </div>
                                         </td>
