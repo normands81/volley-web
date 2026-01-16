@@ -505,9 +505,14 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Foto Profilo</label>
                         <div className="flex items-center space-x-4">
-                            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200">
+                            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 relative group">
                                 {photoPreview ? (
-                                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                    <a href={photoPreview} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                                        <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
+                                            <Eye className="text-white opacity-0 group-hover:opacity-100 drop-shadow-md" size={20} />
+                                        </div>
+                                    </a>
                                 ) : (
                                     <Upload className="text-gray-400" size={24} />
                                 )}
@@ -529,13 +534,23 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                                         Carica Foto
                                     </button>
                                     {photoPreview && (
-                                        <button
-                                            type="button"
-                                            onClick={handleRemovePhoto}
-                                            className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center"
-                                        >
-                                            <Trash2 size={14} className="mr-1" /> Rimuovi
-                                        </button>
+                                        <>
+                                            <a
+                                                href={photoPreview}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center"
+                                            >
+                                                <Eye size={14} className="mr-1" /> Visualizza
+                                            </a>
+                                            <button
+                                                type="button"
+                                                onClick={handleRemovePhoto}
+                                                className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center"
+                                            >
+                                                <Trash2 size={14} className="mr-1" /> Rimuovi
+                                            </button>
+                                        </>
                                     )}
                                 </div>
                                 <p className="text-xs text-gray-500 mt-2">Formati supportati: JPG, PNG. Max 5MB.</p>
