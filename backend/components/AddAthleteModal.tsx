@@ -30,6 +30,12 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
     const [photo, setPhoto] = useState<File | null>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
+    // New fields for Document (Identity Card etc)
+    const [docId, setDocId] = useState('');
+    const [docDueDate, setDocDueDate] = useState('');
+    const [docFile, setDocFile] = useState<File | null>(null);
+    const [docFileName, setDocFileName] = useState<string | null>(null); // To show selected filename
+
     // State for seasons and teams
     const [seasons, setSeasons] = useState<Season[]>([]);
     const [seasonId, setSeasonId] = useState<number | ''>('');
@@ -42,6 +48,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
     const [error, setError] = useState<string | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const docInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -61,6 +68,11 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
 
                 setTeamId(initialData.idteam || '');
                 setPhotoPreview(initialData.photo_url || initialData.photo || null);
+
+                // Set new fields
+                setDocId(initialData.doc_id || '');
+                setDocDueDate(initialData.doc_duedate || '');
+                setDocFileName(initialData.doc_url ? 'Documento presente' : null);
             } else {
                 // Reset fields
                 setName('');
@@ -72,6 +84,12 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 setTeamId('');
                 setPhoto(null);
                 setPhotoPreview(null);
+
+                // Reset new fields
+                setDocId('');
+                setDocDueDate('');
+                setDocFile(null);
+                setDocFileName(null);
             }
             setError(null);
         }
@@ -154,6 +172,22 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
         }
     };
 
+    const handleDocChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setDocFile(file);
+            setDocFileName(file.name);
+        }
+    };
+
+    const handleRemoveDoc = () => {
+        setDocFile(null);
+        setDocFileName(null);
+        if (docInputRef.current) {
+            docInputRef.current.value = '';
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -194,6 +228,34 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 photoUrl = null;
             }
 
+            // Handle Document Upload
+            let currentDocUrl = initialData?.doc_url || null;
+
+            if (docFile) {
+                const fileExt = docFile.name.split('.').pop();
+                const fileName = `doc_${Math.random().toString(36).substring(2)}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                // Upload to 'athletes' bucket (or a specific 'documents' folder if preferred, but keeping simple)
+                const { error: uploadError } = await supabase.storage
+                    .from('athletes')
+                    .upload(filePath, docFile);
+
+                if (uploadError) {
+                    console.error("Doc Upload error", uploadError);
+                    throw new Error(`Upload documento fallito: ${uploadError.message}`);
+                }
+
+                const { data: urlData } = supabase.storage
+                    .from('athletes')
+                    .getPublicUrl(filePath);
+
+                currentDocUrl = urlData.publicUrl;
+            } else if (docFileName === null && initialData?.doc_url) {
+                // If doc filename was cleared, remove the doc url
+                currentDocUrl = null;
+            }
+
             const athleteData = {
                 name,
                 lastname,
@@ -202,7 +264,10 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 number: number || null,
                 idteam: teamId,
                 photo: photoUrl,
-                idseason: seasonId
+                idseason: seasonId,
+                doc_id: docId || null,
+                doc_duedate: docDueDate || null,
+                doc_url: currentDocUrl
             };
 
             let error;
@@ -310,6 +375,63 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                             onChange={(e) => setCertificateDueDate(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Numero Documento</label>
+                            <input
+                                type="text"
+                                value={docId}
+                                onChange={(e) => setDocId(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Scadenza Documento</label>
+                            <input
+                                type="date"
+                                value={docDueDate}
+                                onChange={(e) => setDocDueDate(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Documento d'Identità</label>
+                        <div className="flex items-center space-x-4">
+                            <div className="flex-1">
+                                <input
+                                    type="file"
+                                    ref={docInputRef}
+                                    onChange={handleDocChange}
+                                    className="hidden"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                />
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => docInputRef.current?.click()}
+                                        className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                    >
+                                        Carica Documento
+                                    </button>
+                                    <span className="text-sm text-gray-600 truncate max-w-[200px]">
+                                        {docFileName || "Nessun file selezionato"}
+                                    </span>
+                                    {docFileName && (
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveDoc}
+                                            className="px-2 py-1 text-red-600 hover:bg-red-50 rounded"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Season Dropdown */}
