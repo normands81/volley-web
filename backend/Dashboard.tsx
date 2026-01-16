@@ -36,6 +36,7 @@ const Dashboard: React.FC = () => {
     const [partnersCount, setPartnersCount] = React.useState<number | null>(null);
     const [newsCount, setNewsCount] = React.useState<number | null>(null);
     const [athletesCount, setAthletesCount] = React.useState<number | null>(null);
+    const [certStats, setCertStats] = React.useState<{ valid: number; expiring: number; total: number; percentage: number } | null>(null);
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -102,6 +103,40 @@ const Dashboard: React.FC = () => {
                     } else {
                         setAthletesCount(athleteCount);
                     }
+
+                    // 6. Calculate Certificate Stats
+                    const { data: athletesData, error: certError } = await supabase
+                        .from('TbTeamsMembers')
+                        .select('certificate_duedate')
+                        .eq('idseason', seasonData.idseason)
+                        .eq('active', true); // Only count active athletes for certificates? Assuming yes based on context.
+
+                    if (certError) {
+                        console.error('Error fetching certificates:', certError);
+                    } else if (athletesData) {
+                        const total = athletesData.length;
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        let valid = 0;
+                        let expiring = 0; // Expired or missing
+
+                        athletesData.forEach((athlete: any) => {
+                            if (athlete.certificate_duedate) {
+                                const dueDate = new Date(athlete.certificate_duedate);
+                                if (dueDate > today) {
+                                    valid++;
+                                } else {
+                                    expiring++;
+                                }
+                            } else {
+                                expiring++; // Treat missing as expired/invalid
+                            }
+                        });
+
+                        const percentage = total > 0 ? Math.round((valid / total) * 100) : 0;
+                        setCertStats({ valid, expiring, total, percentage });
+                    }
                 }
             } catch (err) {
                 console.error('Unexpected error fetching dashboard stats:', err);
@@ -163,17 +198,31 @@ const Dashboard: React.FC = () => {
                     />
                 </div>
 
-                {/* Chart Widget (Simplistic implementation) */}
+                {/* Chart Widget */}
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col items-center justify-center">
                     <h3 className="font-bold text-slate-800 mb-6 self-start">Stato Certificati</h3>
-                    <div className="relative w-40 h-40 rounded-full border-[12px] border-slate-100 flex items-center justify-center border-t-blue-500 border-r-blue-500 rotate-45">
-                        {/* CSS trick for donut chart */}
-                        <div className="absolute inset-0 rounded-full border-[12px] border-transparent border-l-blue-200 -rotate-90"></div>
-                        <span className="text-3xl font-bold text-blue-600 -rotate-45">75%</span>
+                    <div className="relative w-40 h-40 flex items-center justify-center">
+                        {/* Conic Gradient Chart */}
+                        <div
+                            className="w-full h-full rounded-full"
+                            style={{
+                                background: `conic-gradient(#3b82f6 0% ${certStats ? certStats.percentage : 0}%, #e2e8f0 ${certStats ? certStats.percentage : 0}% 100%)`
+                            }}
+                        ></div>
+                        {/* Inner Circle to create Donut */}
+                        <div className="absolute w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                            <span className="text-3xl font-bold text-blue-600">{certStats ? certStats.percentage : 0}%</span>
+                        </div>
                     </div>
                     <div className="flex items-center space-x-4 mt-6 text-xs text-slate-500">
-                        <div className="flex items-center"><span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span> In regola</div>
-                        <div className="flex items-center"><span className="w-2 h-2 bg-slate-200 rounded-full mr-1"></span> In Scadenza</div>
+                        <div className="flex items-center" title="Scadenza futura">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
+                            In regola ({certStats ? certStats.valid : 0})
+                        </div>
+                        <div className="flex items-center" title="Scaduti o Mancanti">
+                            <span className="w-2 h-2 bg-slate-200 rounded-full mr-1"></span>
+                            Irregolari ({certStats ? certStats.expiring : 0})
+                        </div>
                     </div>
                 </div>
 
