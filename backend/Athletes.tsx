@@ -106,6 +106,14 @@ const Athletes: React.FC = () => {
         }
     };
 
+    const isExpired = (dateString: string | null) => {
+        if (!dateString) return true;
+        const date = new Date(dateString);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Compare dates only
+        return date < today;
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
@@ -173,7 +181,7 @@ const Athletes: React.FC = () => {
                                 <th className="px-6 py-4 font-semibold">Squadra</th>
                                 <th className="px-6 py-4 font-semibold">Data di nascita</th>
                                 <th className="px-6 py-4 font-semibold">Scadenza certificato</th>
-                                <th className="px-6 py-4 font-semibold">Numero</th>
+                                <th className="px-6 py-4 font-semibold">Scadenza documento</th>
                                 <th className="px-6 py-4 font-semibold">Stagione</th>
                                 <th className="px-6 py-4 font-semibold text-right">Azioni</th>
                             </tr>
@@ -217,10 +225,20 @@ const Athletes: React.FC = () => {
                                             {athlete.birth_date || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
-                                            {athlete.certificate_duedate || '-'}
+                                            <div className="flex items-center space-x-2">
+                                                <span>{athlete.certificate_duedate || '-'}</span>
+                                                {isExpired(athlete.certificate_duedate) && (
+                                                    <AlertCircle size={16} className="text-red-500" />
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
-                                            {athlete.number || '-'}
+                                            <div className="flex items-center space-x-2">
+                                                <span>{athlete.doc_duedate || '-'}</span>
+                                                {isExpired(athlete.doc_duedate) && (
+                                                    <AlertCircle size={16} className="text-red-500" />
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
                                             {athlete.season_description || '-'}
