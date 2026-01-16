@@ -13,6 +13,7 @@ const News: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [onlyCurrentSeason, setOnlyCurrentSeason] = useState(true);
     const [onlyActive, setOnlyActive] = useState(false); // Default false to show drafts too
+    const [currentSeasonId, setCurrentSeasonId] = useState<number | null>(null);
 
     // Debounce search term to avoid too many requests
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -84,54 +85,26 @@ const News: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchNews();
-    }, [debouncedSearchTerm, onlyCurrentSeason, onlyActive]);
+        const fetchCurrentSeason = async () => {
+            const { data } = await supabase
+                .from('TbSeasons')
+                .select('idseason')
+                .eq('current', true)
+                .single();
+            if (data) setCurrentSeasonId(data.idseason);
+        };
+        fetchCurrentSeason();
+    }, []);
+
+    useEffect(() => {
+        if (currentSeasonId || !onlyCurrentSeason) {
+            fetchNews();
+        }
+    }, [debouncedSearchTerm, onlyCurrentSeason, onlyActive, currentSeasonId]);
 
     const fetchNews = async () => {
         try {
             setLoading(true);
-            let query = supabase
-                .from('vw_news_list')
-                .select('*')
-                .order('event_date', { ascending: false });
-
-            if (onlyCurrentSeason) {
-                // Assuming the view has a 'current' field for the season from joined TbSeasons
-                // Alternatively filter by idseason if we know the current one, but vw usually has flags
-                // Let's check if 'current' column exists in vw_news_list via the earlier execute_sql
-                // The earlier SQL output showed 'event_date', 'title', 'subtitle', etc.
-                // It showed 'season_description', 'idseason'. It did NOT explicitly show 'season_current' or similar. 
-                // However, athletes view had it. I'll gamble on `idseason` matching current season logic or fetch active seasons first.
-                // BETTER: Filter by 'season_description' or join manually. 
-                // Wait, typically vw_..._list includes season flags. 
-                // If not, I'll fetch current season ID first or rely on client side filter (bad for pagination but ok here).
-                // Actually, let's look at `vw_news_list` columns again from memory: idseason is present.
-                // I'll fetch active season first then filter.
-            }
-            // Retrying query logic more carefully:
-            // I'll assume common pattern: fetch all then client filter if strict sql unknown OR
-            // I'll first fetch the current season ID.
-        } catch (err) {
-            // ... 
-        }
-        // ...
-        // Re-implementing fetch logic properly below
-    };
-
-    // STARTING OVER fetchNews with better logic
-    const fetchNewsReal = async () => {
-        try {
-            setLoading(true);
-
-            let currentSeasonId: number | null = null;
-            if (onlyCurrentSeason) {
-                const { data: seasonData } = await supabase
-                    .from('TbSeasons')
-                    .select('idseason')
-                    .eq('current', true)
-                    .single();
-                if (seasonData) currentSeasonId = seasonData.idseason;
-            }
 
             let query = supabase
                 .from('vw_news_list')
@@ -161,11 +134,6 @@ const News: React.FC = () => {
             setLoading(false);
         }
     }
-
-    // Using the real fetch function
-    useEffect(() => {
-        fetchNewsReal();
-    }, [debouncedSearchTerm, onlyCurrentSeason, onlyActive]);
 
 
     const formatDate = (dateString: string | null) => {
