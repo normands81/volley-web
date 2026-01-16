@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
+import AutoLogout from './AutoLogout';
 
 const ProtectedRoute = () => {
     const [hasSession, setHasSession] = useState<boolean | null>(null);
@@ -36,7 +37,12 @@ const ProtectedRoute = () => {
     }
 
     console.log("ProtectedRoute: Session valid. Rendering outlet.");
-    return <Outlet />;
+    return (
+        <>
+            <AutoLogout />
+            <Outlet />
+        </>
+    );
 };
 
 export default ProtectedRoute;
