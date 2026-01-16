@@ -36,7 +36,9 @@ const Dashboard: React.FC = () => {
     const [partnersCount, setPartnersCount] = React.useState<number | null>(null);
     const [newsCount, setNewsCount] = React.useState<number | null>(null);
     const [athletesCount, setAthletesCount] = React.useState<number | null>(null);
+
     const [certStats, setCertStats] = React.useState<{ valid: number; expiring: number; total: number; percentage: number } | null>(null);
+    const [docStats, setDocStats] = React.useState<{ valid: number; expiring: number; total: number; percentage: number } | null>(null);
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -104,38 +106,59 @@ const Dashboard: React.FC = () => {
                         setAthletesCount(athleteCount);
                     }
 
-                    // 6. Calculate Certificate Stats
+                    // 6. Calculate Certificate and Document Stats
                     const { data: athletesData, error: certError } = await supabase
                         .from('TbTeamsMembers')
-                        .select('certificate_duedate')
+                        .select('certificate_duedate, doc_duedate')
                         .eq('idseason', seasonData.idseason)
                         .eq('active', true); // Only count active athletes for certificates? Assuming yes based on context.
 
                     if (certError) {
-                        console.error('Error fetching certificates:', certError);
+                        console.error('Error fetching certificates/documents:', certError);
                     } else if (athletesData) {
                         const total = athletesData.length;
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
 
-                        let valid = 0;
-                        let expiring = 0; // Expired or missing
+                        // Certificates
+                        let certValid = 0;
+                        let certExpiring = 0;
+
+                        // Documents
+                        let docValid = 0;
+                        let docExpiring = 0;
 
                         athletesData.forEach((athlete: any) => {
+                            // Check Certificate
                             if (athlete.certificate_duedate) {
-                                const dueDate = new Date(athlete.certificate_duedate);
-                                if (dueDate > today) {
-                                    valid++;
+                                const certDate = new Date(athlete.certificate_duedate);
+                                if (certDate > today) {
+                                    certValid++;
                                 } else {
-                                    expiring++;
+                                    certExpiring++;
                                 }
                             } else {
-                                expiring++; // Treat missing as expired/invalid
+                                certExpiring++;
+                            }
+
+                            // Check Document
+                            if (athlete.doc_duedate) {
+                                const docDate = new Date(athlete.doc_duedate);
+                                if (docDate > today) {
+                                    docValid++;
+                                } else {
+                                    docExpiring++;
+                                }
+                            } else {
+                                docExpiring++;
                             }
                         });
 
-                        const percentage = total > 0 ? Math.round((valid / total) * 100) : 0;
-                        setCertStats({ valid, expiring, total, percentage });
+                        const certPercentage = total > 0 ? Math.round((certValid / total) * 100) : 0;
+                        setCertStats({ valid: certValid, expiring: certExpiring, total, percentage: certPercentage });
+
+                        const docPercentage = total > 0 ? Math.round((docValid / total) * 100) : 0;
+                        setDocStats({ valid: docValid, expiring: docExpiring, total, percentage: docPercentage });
                     }
                 }
             } catch (err) {
@@ -227,22 +250,30 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Utility Widget */}
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                    <h3 className="font-bold text-slate-800 mb-4">Bozze News</h3>
-                    <div className="space-y-4">
-                        <div className="p-3 bg-slate-50 rounded-lg flex items-start space-x-3 cursor-pointer hover:bg-slate-100 transition-colors">
-                            <Calendar size={18} className="text-slate-400 mt-0.5" />
-                            <div>
-                                <p className="text-sm font-medium text-slate-700">Nuovo Campo in Arrivo!</p>
-                                <p className="text-xs text-slate-400 mt-1">Modificato 2 ore fa</p>
-                            </div>
+                {/* Document Stats Widget */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col items-center justify-center">
+                    <h3 className="font-bold text-slate-800 mb-6 self-start">Stato Documenti</h3>
+                    <div className="relative w-40 h-40 flex items-center justify-center">
+                        {/* Conic Gradient Chart */}
+                        <div
+                            className="w-full h-full rounded-full"
+                            style={{
+                                background: `conic-gradient(#add8e6 0% ${docStats ? docStats.percentage : 0}%, #e2e8f0 ${docStats ? docStats.percentage : 0}% 100%)`
+                            }}
+                        ></div>
+                        {/* Inner Circle to create Donut */}
+                        <div className="absolute w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                            <span className="text-3xl font-bold text-sky-400">{docStats ? docStats.percentage : 0}%</span>
                         </div>
-                        <div className="p-3 bg-slate-50 rounded-lg flex items-start space-x-3 cursor-pointer hover:bg-slate-100 transition-colors">
-                            <Edit3 size={18} className="text-slate-400 mt-0.5" />
-                            <div>
-                                <p className="text-sm font-medium text-slate-700">Intervista al Coach Rosai 🔴</p>
-                                <p className="text-xs text-slate-400 mt-1">Bozza automatica</p>
-                            </div>
+                    </div>
+                    <div className="flex items-center space-x-4 mt-6 text-xs text-slate-500">
+                        <div className="flex items-center" title="Scadenza futura">
+                            <span className="w-2 h-2 bg-sky-400 rounded-full mr-1"></span>
+                            In regola ({docStats ? docStats.valid : 0})
+                        </div>
+                        <div className="flex items-center" title="Scaduti o Mancanti">
+                            <span className="w-2 h-2 bg-slate-200 rounded-full mr-1"></span>
+                            Irregolari ({docStats ? docStats.expiring : 0})
                         </div>
                     </div>
                 </div>
