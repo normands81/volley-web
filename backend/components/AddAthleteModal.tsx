@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../services/supabaseClient';
-import { X, Loader2, Upload, Trash2 } from 'lucide-react';
+import { X, Loader2, Upload, Trash2, FileText } from 'lucide-react';
 
 interface Team {
     idteam: number;
@@ -33,8 +33,9 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
     // New fields for Document (Identity Card etc)
     const [docId, setDocId] = useState('');
     const [docDueDate, setDocDueDate] = useState('');
+
     const [docFile, setDocFile] = useState<File | null>(null);
-    const [docFileName, setDocFileName] = useState<string | null>(null); // To show selected filename
+    const [docPreview, setDocPreview] = useState<string | null>(null);
 
     // State for seasons and teams
     const [seasons, setSeasons] = useState<Season[]>([]);
@@ -72,7 +73,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 // Set new fields
                 setDocId(initialData.doc_id || '');
                 setDocDueDate(initialData.doc_duedate || '');
-                setDocFileName(initialData.doc_url ? 'Documento presente' : null);
+                setDocPreview(initialData.doc_url || null);
             } else {
                 // Reset fields
                 setName('');
@@ -89,7 +90,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                 setDocId('');
                 setDocDueDate('');
                 setDocFile(null);
-                setDocFileName(null);
+                setDocPreview(null);
             }
             setError(null);
         }
@@ -176,13 +177,13 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setDocFile(file);
-            setDocFileName(file.name);
+            setDocPreview(URL.createObjectURL(file));
         }
     };
 
     const handleRemoveDoc = () => {
         setDocFile(null);
-        setDocFileName(null);
+        setDocPreview(null);
         if (docInputRef.current) {
             docInputRef.current.value = '';
         }
@@ -251,8 +252,8 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                     .getPublicUrl(filePath);
 
                 currentDocUrl = urlData.publicUrl;
-            } else if (docFileName === null && initialData?.doc_url) {
-                // If doc filename was cleared, remove the doc url
+            } else if (docPreview === null && initialData?.doc_url) {
+                // If doc preview was cleared, remove the doc url
                 currentDocUrl = null;
             }
 
@@ -401,6 +402,17 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Documento d'Identità</label>
                         <div className="flex items-center space-x-4">
+                            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200">
+                                {docPreview ? (
+                                    docPreview.endsWith('.pdf') || (docFile && docFile.type === 'application/pdf') ? (
+                                        <FileText className="text-gray-500" size={32} />
+                                    ) : (
+                                        <img src={docPreview} alt="Doc" className="w-full h-full object-cover" />
+                                    )
+                                ) : (
+                                    <Upload className="text-gray-400" size={24} />
+                                )}
+                            </div>
                             <div className="flex-1">
                                 <input
                                     type="file"
@@ -409,7 +421,7 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                                     className="hidden"
                                     accept=".pdf,.jpg,.jpeg,.png"
                                 />
-                                <div className="flex items-center space-x-2">
+                                <div className="flex space-x-2">
                                     <button
                                         type="button"
                                         onClick={() => docInputRef.current?.click()}
@@ -417,19 +429,17 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                                     >
                                         Carica Documento
                                     </button>
-                                    <span className="text-sm text-gray-600 truncate max-w-[200px]">
-                                        {docFileName || "Nessun file selezionato"}
-                                    </span>
-                                    {docFileName && (
+                                    {docPreview && (
                                         <button
                                             type="button"
                                             onClick={handleRemoveDoc}
-                                            className="px-2 py-1 text-red-600 hover:bg-red-50 rounded"
+                                            className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center"
                                         >
-                                            <Trash2 size={16} />
+                                            <Trash2 size={14} className="mr-1" /> Rimuovi
                                         </button>
                                     )}
                                 </div>
+                                <p className="text-xs text-gray-500 mt-2">Formati supportati: JPG, PNG, PDF.</p>
                             </div>
                         </div>
                     </div>
