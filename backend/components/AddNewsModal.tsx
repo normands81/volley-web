@@ -17,7 +17,7 @@ interface AddNewsModalProps {
 
 const AddNewsModal: React.FC<AddNewsModalProps> = ({ isOpen, onClose, onNewsAdded, initialData }) => {
     const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+    const [news_description, setNewsDescription] = useState('');
     const [eventDate, setEventDate] = useState('');
     const [published, setPublished] = useState(true);
 
@@ -38,14 +38,14 @@ const AddNewsModal: React.FC<AddNewsModalProps> = ({ isOpen, onClose, onNewsAdde
             fetchSeasons();
             if (initialData) {
                 setTitle(initialData.title || '');
-                setDescription(initialData.description || '');
+                setNewsDescription(initialData.news_description || '');
                 setEventDate(initialData.event_date || '');
                 setPublished(initialData.published ?? true); // Default to true if undefined, but respect false
                 setSeasonId(initialData.idseason || '');
                 setPhotoPreview(initialData.photo || null);
             } else {
                 setTitle('');
-                setDescription('');
+                setNewsDescription('');
                 setEventDate(new Date().toISOString().split('T')[0]); // Default to today
                 setPublished(true);
                 setSeasonId('');
@@ -137,7 +137,7 @@ const AddNewsModal: React.FC<AddNewsModalProps> = ({ isOpen, onClose, onNewsAdde
 
             const newsData = {
                 title,
-                description,
+                news_description,
                 event_date: eventDate,
                 published,
                 idseason: seasonId,
@@ -210,8 +210,8 @@ const AddNewsModal: React.FC<AddNewsModalProps> = ({ isOpen, onClose, onNewsAdde
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Descrizione</label>
                             <textarea
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
+                                value={news_description}
+                                onChange={(e) => setNewsDescription(e.target.value)}
                                 rows={6}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
