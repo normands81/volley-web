@@ -10,7 +10,9 @@ import DashboardLayout from './backend/DashboardLayout';
 import Dashboard from './backend/Dashboard';
 import Teams from './backend/Teams';
 import Athletes from './backend/Athletes';
+
 import Partners from './backend/Partners';
+import News from './backend/News';
 
 const App: React.FC = () => {
   return (
@@ -29,6 +31,7 @@ const App: React.FC = () => {
             <Route path="/backend/squadre" element={<Teams />} />
             <Route path="/backend/atleti" element={<Athletes />} />
             <Route path="/backend/sponsor" element={<Partners />} />
+            <Route path="/backend/news" element={<News />} />
           </Route>
         </Route>
       </Routes>
