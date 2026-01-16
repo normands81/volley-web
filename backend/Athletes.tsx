@@ -114,6 +114,16 @@ const Athletes: React.FC = () => {
         return date < today;
     };
 
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('it-IT', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
@@ -222,11 +232,11 @@ const Athletes: React.FC = () => {
                                             {athlete.team_description || '-'}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
-                                            {athlete.birth_date || '-'}
+                                            {formatDate(athlete.birth_date)}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
                                             <div className="flex items-center space-x-2">
-                                                <span>{athlete.certificate_duedate || '-'}</span>
+                                                <span>{formatDate(athlete.certificate_duedate)}</span>
                                                 {isExpired(athlete.certificate_duedate) && (
                                                     <AlertCircle size={16} className="text-red-500" />
                                                 )}
@@ -234,7 +244,7 @@ const Athletes: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
                                             <div className="flex items-center space-x-2">
-                                                <span>{athlete.doc_duedate || '-'}</span>
+                                                <span>{formatDate(athlete.doc_duedate)}</span>
                                                 {isExpired(athlete.doc_duedate) && (
                                                     <AlertCircle size={16} className="text-red-500" />
                                                 )}
