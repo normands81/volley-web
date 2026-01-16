@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../services/supabaseClient';
-import { X, Loader2, Upload, Trash2, FileText } from 'lucide-react';
+import { X, Loader2, Upload, Trash2, FileText, Eye } from 'lucide-react';
 
 interface Team {
     idteam: number;
@@ -402,13 +402,20 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Documento d'Identità</label>
                         <div className="flex items-center space-x-4">
-                            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200">
+                            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200 relative group">
                                 {docPreview ? (
-                                    docPreview.endsWith('.pdf') || (docFile && docFile.type === 'application/pdf') ? (
-                                        <FileText className="text-gray-500" size={32} />
-                                    ) : (
-                                        <img src={docPreview} alt="Doc" className="w-full h-full object-cover" />
-                                    )
+                                    <a href={docPreview} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                                        {docPreview.endsWith('.pdf') || (docFile && docFile.type === 'application/pdf') ? (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <FileText className="text-gray-500" size={32} />
+                                            </div>
+                                        ) : (
+                                            <img src={docPreview} alt="Doc" className="w-full h-full object-cover" />
+                                        )}
+                                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center">
+                                            <Eye className="text-white opacity-0 group-hover:opacity-100 drop-shadow-md" size={20} />
+                                        </div>
+                                    </a>
                                 ) : (
                                     <Upload className="text-gray-400" size={24} />
                                 )}
@@ -430,13 +437,23 @@ const AddAthleteModal: React.FC<AddAthleteModalProps> = ({ isOpen, onClose, onAt
                                         Carica Documento
                                     </button>
                                     {docPreview && (
-                                        <button
-                                            type="button"
-                                            onClick={handleRemoveDoc}
-                                            className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center"
-                                        >
-                                            <Trash2 size={14} className="mr-1" /> Rimuovi
-                                        </button>
+                                        <>
+                                            <a
+                                                href={docPreview}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center"
+                                            >
+                                                <Eye size={14} className="mr-1" /> Visualizza
+                                            </a>
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveDoc}
+                                                className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center"
+                                            >
+                                                <Trash2 size={14} className="mr-1" /> Rimuovi
+                                            </button>
+                                        </>
                                     )}
                                 </div>
                                 <p className="text-xs text-gray-500 mt-2">Formati supportati: JPG, PNG, PDF.</p>
