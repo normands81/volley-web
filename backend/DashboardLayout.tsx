@@ -11,7 +11,8 @@ import {
     Bell,
     User,
     Menu,
-    Banknote
+    Banknote,
+    Calendar
 } from 'lucide-react';
 import { getAssetPath } from '../utils';
 
@@ -39,6 +40,7 @@ const DashboardLayout: React.FC = () => {
         { path: '/backend/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
         { path: '/backend/squadre', label: 'Gestione Squadre', icon: <Shield size={20} /> },
         { path: '/backend/atleti', label: 'Anagrafica Atleti', icon: <Users size={20} /> },
+        { path: '/backend/calendari', label: 'Calendari', icon: <Calendar size={20} /> },
         { path: '/backend/sponsor', label: 'Sponsor & Partner', icon: <Banknote size={20} /> },
         { path: '/backend/news', label: 'Area News', icon: <Newspaper size={20} /> },
     ];
