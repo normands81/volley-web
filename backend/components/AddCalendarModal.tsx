@@ -10,13 +10,15 @@ interface Team {
 }
 
 interface CalendarEntry {
-    idcalendar?: number;
+    id?: number;
     idteam: number;
     opponent: string;
     match_date: string;
     match_time: string;
     match_location: string;
     match_id: string;
+    home: boolean;
+    idseason: number;
 }
 
 interface AddCalendarModalProps {
@@ -33,6 +35,10 @@ const AddCalendarModal: React.FC<AddCalendarModalProps> = ({ isOpen, onClose, on
     const [matchTime, setMatchTime] = useState('');
     const [location, setLocation] = useState('');
     const [matchCode, setMatchCode] = useState('');
+    const [isHome, setIsHome] = useState(true);
+
+    // We need to track the season associated with the selected team
+    const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
 
     const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(false);
@@ -44,18 +50,22 @@ const AddCalendarModal: React.FC<AddCalendarModalProps> = ({ isOpen, onClose, on
             fetchTeams();
             if (initialData) {
                 setTeamId(initialData.idteam);
+                setSelectedSeasonId(initialData.idseason); // Assuming initialData has idseason
                 setOpponent(initialData.opponent);
                 setMatchDate(initialData.match_date ? initialData.match_date.split('T')[0] : '');
                 setMatchTime(initialData.match_time || '');
                 setLocation(initialData.match_location || '');
                 setMatchCode(initialData.match_id || '');
+                setIsHome(initialData.home ?? true);
             } else {
                 setTeamId('');
+                setSelectedSeasonId(null);
                 setOpponent('');
                 setMatchDate(new Date().toISOString().split('T')[0]);
                 setMatchTime('');
                 setLocation('');
                 setMatchCode('');
+                setIsHome(true);
             }
             setError(null);
         }
@@ -79,9 +89,21 @@ const AddCalendarModal: React.FC<AddCalendarModalProps> = ({ isOpen, onClose, on
         }
     };
 
+    const handleTeamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedId = Number(e.target.value);
+        setTeamId(selectedId);
+
+        const team = teams.find(t => t.idteam === selectedId);
+        if (team) {
+            setSelectedSeasonId(team.idseason);
+        } else {
+            setSelectedSeasonId(null);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!teamId || !opponent || !matchDate) {
+        if (!teamId || !opponent || !matchDate || !selectedSeasonId) {
             setError('Squadra, Avversario e Data sono obbligatori.');
             return;
         }
@@ -92,21 +114,23 @@ const AddCalendarModal: React.FC<AddCalendarModalProps> = ({ isOpen, onClose, on
 
             const payload = {
                 idteam: teamId,
+                idseason: selectedSeasonId,
                 opponent,
                 match_date: matchDate,
                 match_time: matchTime,
                 match_location: location,
-                match_id: matchCode
+                match_id: matchCode,
+                home: isHome
             };
 
             let error;
 
-            if (initialData && initialData.idcalendar) {
+            if (initialData && initialData.id) {
                 // Update
                 const { error: updateError } = await supabase
                     .from('TbCalendars')
                     .update(payload)
-                    .eq('idcalendar', initialData.idcalendar);
+                    .eq('id', initialData.id);
                 error = updateError;
             } else {
                 // Insert
@@ -151,7 +175,7 @@ const AddCalendarModal: React.FC<AddCalendarModalProps> = ({ isOpen, onClose, on
                         <label className="block text-sm font-medium text-gray-700 mb-1">Squadra *</label>
                         <select
                             value={teamId}
-                            onChange={(e) => setTeamId(Number(e.target.value))}
+                            onChange={handleTeamChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             disabled={loadingTeams}
                         >
@@ -164,15 +188,28 @@ const AddCalendarModal: React.FC<AddCalendarModalProps> = ({ isOpen, onClose, on
                         </select>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Avversario *</label>
-                        <input
-                            type="text"
-                            value={opponent}
-                            onChange={(e) => setOpponent(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Es. Volley Savigliano"
-                        />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Avversario *</label>
+                            <input
+                                type="text"
+                                value={opponent}
+                                onChange={(e) => setOpponent(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Es. Volley Savigliano"
+                            />
+                        </div>
+                        <div className="flex items-end">
+                            <label className="flex items-center space-x-2 px-3 py-2 border border-gray-200 rounded-md w-full bg-slate-50 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={isHome}
+                                    onChange={(e) => setIsHome(e.target.checked)}
+                                    className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                />
+                                <span className="text-sm font-medium text-gray-700">In Casa</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
